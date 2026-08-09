@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Navigation Tabs
-  const navBtns = document.querySelectorAll('.nav-btn');
-  const viewTabs = document.querySelectorAll('.view-tab');
+  const navBtns = document.querySelectorAll('.m3-nav-item');
+  const viewTabs = document.querySelectorAll('.m3-view-tab');
 
   // Input Controls
   const urlInput = document.getElementById('urlInput');
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Library / Queue Elements
   const queueList = document.getElementById('queueList');
   const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-  const filterPills = document.querySelectorAll('.filter-pill');
+  const filterPills = document.querySelectorAll('.m3-filter-chips .m3-filter-chip');
 
   // Ad & Modals Elements
   const interstitialModal = document.getElementById('interstitialModal');
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let downloadCount = 0;
   let autoPreviewTimeout = null;
 
-  // Tab Navigation Handling
+  // M3 Tab Navigation
   navBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetTab = btn.dataset.tab;
@@ -67,31 +67,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Pill Options Selection Helper
-  setupPillGroup('formatGroup', (val, labelText) => {
+  // M3 Segmented Buttons Selection Helper
+  setupSegmentGroup('formatGroup', (val, labelText) => {
     selectedFormat = val;
     document.getElementById('selectedFormatLabel').innerText = labelText;
   });
 
-  setupPillGroup('qualityGroup', (val, labelText) => {
+  setupSegmentGroup('qualityGroup', (val, labelText) => {
     selectedQuality = val;
     document.getElementById('selectedQualityLabel').innerText = labelText;
   });
 
-  setupPillGroup('audioGroup', (val, labelText) => {
+  setupSegmentGroup('audioGroup', (val, labelText) => {
     selectedAudio = val;
     document.getElementById('selectedAudioLabel').innerText = labelText;
   });
 
-  function setupPillGroup(groupId, callback) {
+  function setupSegmentGroup(groupId, callback) {
     const group = document.getElementById(groupId);
     if (!group) return;
-    const pills = group.querySelectorAll('.seg-pill');
-    pills.forEach(pill => {
-      pill.addEventListener('click', () => {
-        pills.forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        callback(pill.dataset.value, pill.innerText);
+    const segments = group.querySelectorAll('.m3-segment');
+    segments.forEach(segment => {
+      segment.addEventListener('click', () => {
+        segments.forEach(s => s.classList.remove('active'));
+        segment.classList.add('active');
+        callback(segment.dataset.value, segment.innerText);
       });
     });
   }
@@ -132,8 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
       platformDetector.innerText = '🤖 Reddit Link';
       platformDetector.style.color = '#ff4500';
     } else {
-      platformDetector.innerText = 'Auto-Detect Media';
-      platformDetector.style.color = 'var(--accent-cyan)';
+      platformDetector.innerText = 'Auto-detect social link';
+      platformDetector.style.color = 'var(--m3-text-tertiary)';
     }
   }
 
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
           previewThumbnail.classList.add('hidden');
         }
 
-        showToast('Video preview popped out!', '✨');
+        showSnackbar('Video preview popped out!', 'check_circle');
       } else {
         previewTitle.innerText = 'Ready to download';
       }
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     urlInput.value = link;
     detectPlatform(link);
     triggerAutoPreview(link);
-    showToast('Sample link loaded!', '✨');
+    showSnackbar('Sample link loaded!', 'auto_fix_high');
   });
 
   // Paste Clipboard Action
@@ -204,13 +204,13 @@ document.addEventListener('DOMContentLoaded', () => {
           urlInput.value = text.trim();
           detectPlatform(urlInput.value);
           triggerAutoPreview(urlInput.value);
-          showToast('Pasted from clipboard!', '📋');
+          showSnackbar('Pasted from clipboard!', 'content_paste');
         }
       } else {
-        showToast('Clipboard access unavailable', '⚠️');
+        showSnackbar('Clipboard access unavailable', 'warning');
       }
     } catch (e) {
-      showToast('Clipboard access denied', '⚠️');
+      showSnackbar('Clipboard access denied', 'warning');
     }
   });
 
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     detectPlatform('');
   });
 
-  // Clipboard Smart Banner Simulator
+  // Smart Clipboard Prompt Simulator
   setTimeout(() => {
     if (autoClipboardToggle && autoClipboardToggle.checked) {
       clipboardBanner.classList.remove('hidden');
@@ -237,14 +237,14 @@ document.addEventListener('DOMContentLoaded', () => {
     detectPlatform(urlInput.value);
     triggerAutoPreview(urlInput.value);
     clipboardBanner.classList.add('hidden');
-    showToast('Link pasted!', '⚡');
+    showSnackbar('Link pasted!', 'download');
   });
 
   // Manual Preview Metadata Button
   previewBtn.addEventListener('click', () => {
     const raw = urlInput.value.trim();
     if (!raw) {
-      showToast('Please paste a video URL first', '⚠️');
+      showSnackbar('Please paste a video URL first', 'warning');
       return;
     }
     triggerAutoPreview(raw);
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
   downloadBtn.addEventListener('click', () => {
     const raw = urlInput.value.trim();
     if (!raw) {
-      showToast('Please paste a video URL first', '⚠️');
+      showSnackbar('Please paste a video URL first', 'warning');
       return;
     }
 
@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Interstitial Ad Unit Simulator
+  // Interstitial Ad Simulator
   function triggerInterstitialAd(onComplete) {
     interstitialModal.classList.remove('hidden');
     adTimerBar.style.width = '0%';
@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     historyItems.push(itemObj);
     renderQueue();
-    showToast('Download started!', '⚡');
+    showSnackbar('Download started!', 'downloading');
 
     try {
       const res = await fetch('/api/download', {
@@ -342,32 +342,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         renderQueue();
-        showToast('Download completed!', '🎉');
+        showSnackbar('Download completed!', 'check_circle');
       } else {
         itemObj.status = 'Failed';
         itemObj.progress = 0;
         renderQueue();
-        showToast(data.detail || 'Download failed', '❌');
+        showSnackbar(data.detail || 'Download failed', 'error');
       }
     } catch (err) {
       itemObj.status = 'Failed';
       itemObj.progress = 0;
       renderQueue();
-      showToast('Server connection error.', '❌');
+      showSnackbar('Server connection error.', 'error');
     }
   }
 
   // Render Queue & History Items
   function renderQueue(filter = 'all') {
-    const emptyState = queueList.querySelector('.empty-library');
     queueList.innerHTML = '';
 
     if (historyItems.length === 0) {
       queueList.innerHTML = `
-        <div class="empty-library">
-          <div class="empty-icon">📁</div>
-          <h3>Your library is empty</h3>
-          <p>Paste a video link on the Saver tab to start downloading media.</p>
+        <div class="m3-empty-state">
+          <span class="material-symbols-outlined empty-icon">folder_open</span>
+          <h3 class="m3-title-medium">No media files saved yet</h3>
+          <p class="m3-body-small">Paste a link on the Saver tab to start downloading.</p>
         </div>
       `;
       return;
@@ -382,27 +381,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filtered.slice().reverse().forEach(item => {
       const card = document.createElement('div');
-      card.className = 'queue-card-item';
+      card.className = 'm3-queue-card';
       
       let actionButtons = '';
       if (item.status === 'Completed' && item.fileUrl) {
         actionButtons = `
-          <button class="tool-btn text-accent" onclick="playMedia('${encodeURIComponent(item.title)}', '${item.fileUrl}')">▶ Play</button>
-          <a href="${item.fileUrl}" download="${item.filename || 'video.mp4'}" class="tool-btn" style="text-decoration:none;">💾 Save</a>
+          <button class="m3-btn-text" onclick="playMedia('${encodeURIComponent(item.title)}', '${item.fileUrl}')">▶ Play</button>
+          <a href="${item.fileUrl}" download="${item.filename || 'video.mp4'}" class="m3-btn-filled-tonal" style="text-decoration:none;">💾 Save</a>
         `;
       }
 
       card.innerHTML = `
-        <div class="queue-header">
-          <span class="queue-title">${item.title}</span>
-          <span class="status-badge ${item.status.toLowerCase()}">${item.status}</span>
+        <div class="m3-queue-row">
+          <span class="m3-body-medium m3-queue-title">${item.title}</span>
+          <span class="m3-badge-primary">${item.status}</span>
         </div>
-        <div class="progress-track">
-          <div class="progress-fill" style="width: ${item.progress}%"></div>
+        <div class="m3-progress-track">
+          <div class="m3-progress-fill" style="width: ${item.progress}%"></div>
         </div>
-        <div class="queue-footer">
-          <span>Format: ${item.format.toUpperCase()} • Quality: ${item.quality.toUpperCase()}</span>
-          <div class="item-actions">${actionButtons}</div>
+        <div class="m3-queue-row">
+          <span class="m3-label-small">${item.format.toUpperCase()} • ${item.quality.toUpperCase()}</span>
+          <div>${actionButtons}</div>
         </div>
       `;
       queueList.appendChild(card);
@@ -418,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Global Play Media Modal Handler
+  // Global Play Media Handler
   window.playMedia = (titleEncoded, fileUrl) => {
     playerTitle.innerText = decodeURIComponent(titleEncoded);
     videoPlayer.src = fileUrl;
@@ -435,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
   clearHistoryBtn.addEventListener('click', () => {
     historyItems = [];
     renderQueue();
-    showToast('Library cleared', '🧹');
+    showSnackbar('Library cleared', 'cleaning_services');
   });
 
   // Settings & Utilities
@@ -444,15 +443,15 @@ document.addEventListener('DOMContentLoaded', () => {
     urlInput.value = '';
     previewCard.classList.add('hidden');
     renderQueue();
-    showToast('App cache & history cleared!', '🧹');
+    showSnackbar('App cache & history cleared!', 'cleaning_services');
   });
 
   goProBtn.addEventListener('click', () => {
-    showToast('X Saver Pro Unlimited unlocked!', '👑');
+    showSnackbar('VidDownloader Pro Unlimited active!', 'workspace_premium');
   });
 
-  // Toast Notification System
-  function showToast(message, icon = '✨') {
+  // M3 Snackbar System
+  function showSnackbar(message, icon = 'check_circle') {
     const toast = document.getElementById('toast');
     const toastMsg = document.getElementById('toastMessage');
     const toastIcon = document.getElementById('toastIcon');

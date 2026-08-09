@@ -3,167 +3,180 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>X Saver Pro — Universal Media Downloader</title>
+  <title>X Saver — Material Video Saver</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app-container">
-    <!-- Top Header -->
-    <header class="app-header">
-      <div class="brand">
-        <div class="brand-logo">⚡</div>
-        <div class="brand-info">
-          <h1>X Saver Pro</h1>
-          <span id="platformDetector" class="platform-badge-pill">Auto-Detect Media</span>
+  <div class="m3-app-shell">
+    
+    <!-- M3 Top App Bar -->
+    <header class="m3-top-app-bar">
+      <div class="app-bar-leading">
+        <span class="material-symbols-outlined logo-icon">download_for_offline</span>
+        <div class="app-bar-titles">
+          <h1 class="m3-title-medium">VidDownloader</h1>
+          <span class="m3-label-small" id="platformDetector">Auto-detect social link</span>
         </div>
       </div>
-      <div class="header-actions">
-        <button id="goProBtn" class="pro-tag-btn">
-          <span>👑</span> PRO
+      <div class="app-bar-trailing">
+        <button id="goProBtn" class="m3-chip-btn">
+          <span class="material-symbols-outlined">star</span>
+          <span>Pro</span>
         </button>
       </div>
     </header>
 
-    <!-- AdMob Top Banner Unit -->
-    <div class="ad-banner-container">
-      <div class="ad-label">ADVERTISEMENT</div>
-      <div class="ad-banner-body">
-        <span class="ad-badge">Ad</span>
-        <div class="ad-info">
-          <strong>AdMob Banner 320x50</strong>
-          <small>Monetize app views with Google AdMob & Unity Ads</small>
+    <!-- M3 Ad Banner Container -->
+    <div class="m3-ad-card">
+      <span class="m3-ad-label">ADVERTISEMENT</span>
+      <div class="m3-ad-body">
+        <span class="material-symbols-outlined ad-icon">campaign</span>
+        <div class="ad-details">
+          <strong class="m3-body-medium">Google AdMob Unit</strong>
+          <span class="m3-body-small">Monetize app views with AdMob banner ads</span>
         </div>
-        <button class="ad-cta-btn">Install</button>
+        <button class="m3-btn-text">Install</button>
       </div>
     </div>
 
-    <!-- Floating Smart Clipboard Banner -->
-    <div id="clipboardBanner" class="clipboard-banner hidden">
-      <div class="clipboard-icon">📋</div>
-      <div class="clipboard-text">
-        <strong>Copied Link Detected!</strong>
-        <span id="detectedUrlSnippet">https://x.com/status/...</span>
+    <!-- M3 Smart Clipboard Prompt -->
+    <div id="clipboardBanner" class="m3-clipboard-card hidden">
+      <span class="material-symbols-outlined">content_paste_go</span>
+      <div class="clip-info">
+        <strong class="m3-body-medium">Copied link detected</strong>
+        <span class="m3-body-small" id="detectedUrlSnippet">https://x.com/...</span>
       </div>
-      <button id="quickPasteBtn" class="btn btn-primary btn-sm">Paste & Save</button>
-      <button id="closeClipboardBtn" class="close-banner">✕</button>
+      <button id="quickPasteBtn" class="m3-btn-filled-tonal">Paste & Save</button>
+      <button id="closeClipboardBtn" class="m3-icon-btn">
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
 
-    <!-- Main Views Container -->
-    <main class="main-views">
+    <!-- Main View Views Container -->
+    <main class="m3-main-content">
       
-      <!-- ================= 1. SAVER VIEW ================= -->
-      <section id="tab-saver" class="view-tab active-tab">
+      <!-- ================= SAVER VIEW ================= -->
+      <section id="tab-saver" class="m3-view-tab active-tab">
         
-        <!-- Platform Support Badges -->
-        <div class="platform-chips-scroll">
-          <div class="platform-chip active"><span class="chip-dot twitter"></span> X / Twitter</div>
-          <div class="platform-chip"><span class="chip-dot instagram"></span> Instagram</div>
-          <div class="platform-chip"><span class="chip-dot tiktok"></span> TikTok</div>
-          <div class="platform-chip"><span class="chip-dot reddit"></span> Reddit</div>
-          <div class="platform-chip"><span class="chip-dot facebook"></span> Facebook</div>
+        <!-- Platform Filter Chips -->
+        <div class="m3-chip-set">
+          <button class="m3-filter-chip active"><span class="chip-dot twitter"></span> X / Twitter</button>
+          <button class="m3-filter-chip"><span class="chip-dot instagram"></span> Instagram</button>
+          <button class="m3-filter-chip"><span class="chip-dot tiktok"></span> TikTok</button>
+          <button class="m3-filter-chip"><span class="chip-dot reddit"></span> Reddit</button>
         </div>
 
-        <!-- Input Glass Card -->
-        <div class="card glass-card">
-          <div class="card-title-row">
-            <h2>Paste Media Link</h2>
-            <span class="batch-count-badge" id="batchBadge">Single Link</span>
+        <!-- M3 Media Input Card -->
+        <div class="m3-card">
+          <div class="m3-card-header">
+            <h2 class="m3-title-medium">Paste Media Link</h2>
+            <span class="m3-badge-secondary" id="batchBadge">Single Link</span>
           </div>
 
-          <div class="input-container">
-            <textarea id="urlInput" placeholder="Paste X/Twitter, TikTok, Instagram or Reddit video links (single or comma/newline batch)..." rows="3"></textarea>
-            <div class="input-toolbar">
-              <button id="pasteBtn" class="tool-btn">
-                <span>📋</span> Paste Clipboard
+          <div class="m3-text-field-box">
+            <textarea id="urlInput" placeholder="Paste X/Twitter, TikTok, Instagram or Reddit video link..." rows="3"></textarea>
+            <div class="m3-field-actions">
+              <button id="pasteBtn" class="m3-btn-outlined">
+                <span class="material-symbols-outlined">content_paste</span>
+                <span>Paste Link</span>
               </button>
-              <button id="sampleLinkBtn" class="tool-btn text-accent">
-                <span>✨</span> Try Sample Link
+              <button id="sampleLinkBtn" class="m3-btn-text">
+                <span class="material-symbols-outlined">auto_fix_high</span>
+                <span>Sample Link</span>
               </button>
-              <button id="clearBtn" class="tool-btn icon-only" title="Clear">✕</button>
+              <button id="clearBtn" class="m3-icon-btn margin-left-auto" title="Clear">
+                <span class="material-symbols-outlined">close</span>
+              </button>
             </div>
           </div>
 
-          <!-- Format & Quality Options Accordion -->
-          <div class="options-container">
+          <!-- M3 Options Section -->
+          <div class="m3-options-group">
+            
             <!-- Format Choice -->
-            <div class="option-block">
-              <div class="option-header">
-                <span class="option-title">Media Format</span>
-                <span class="option-val-label" id="selectedFormatLabel">Video (MP4)</span>
+            <div class="m3-option-row">
+              <div class="m3-option-label-row">
+                <span class="m3-label-large">Format</span>
+                <span class="m3-label-medium accent" id="selectedFormatLabel">Video (MP4)</span>
               </div>
-              <div class="segmented-pills" id="formatGroup">
-                <button class="seg-pill active" data-value="video">🎬 Video (MP4)</button>
-                <button class="seg-pill" data-value="audio">🎵 Audio Only</button>
+              <div class="m3-segmented-button" id="formatGroup">
+                <button class="m3-segment active" data-value="video">🎬 Video (MP4)</button>
+                <button class="m3-segment" data-value="audio">🎵 Audio Only</button>
               </div>
             </div>
 
             <!-- Quality Choice -->
-            <div class="option-block">
-              <div class="option-header">
-                <span class="option-title">Video Quality</span>
-                <span class="option-val-label" id="selectedQualityLabel">Best Available</span>
+            <div class="m3-option-row">
+              <div class="m3-option-label-row">
+                <span class="m3-label-large">Quality</span>
+                <span class="m3-label-medium accent" id="selectedQualityLabel">Best Available</span>
               </div>
-              <div class="segmented-pills scrollable-pills" id="qualityGroup">
-                <button class="seg-pill active" data-value="best">Best Available</button>
-                <button class="seg-pill" data-value="1080p">1080p HD</button>
-                <button class="seg-pill" data-value="720p">720p HD</button>
-                <button class="seg-pill" data-value="480p">480p SD</button>
-                <button class="seg-pill" data-value="360p">360p Compact</button>
+              <div class="m3-segmented-button scrollable" id="qualityGroup">
+                <button class="m3-segment active" data-value="best">Best</button>
+                <button class="m3-segment" data-value="1080p">1080p</button>
+                <button class="m3-segment" data-value="720p">720p</button>
+                <button class="m3-segment" data-value="480p">480p</button>
+                <button class="m3-segment" data-value="360p">360p</button>
               </div>
             </div>
 
-            <!-- Audio Codec Choice -->
-            <div class="option-block">
-              <div class="option-header">
-                <span class="option-title">Audio Codec</span>
-                <span class="option-val-label" id="selectedAudioLabel">M4A (Default)</span>
+            <!-- Audio Format Choice -->
+            <div class="m3-option-row">
+              <div class="m3-option-label-row">
+                <span class="m3-label-large">Audio Codec</span>
+                <span class="m3-label-medium accent" id="selectedAudioLabel">M4A (Default)</span>
               </div>
-              <div class="segmented-pills" id="audioGroup">
-                <button class="seg-pill active" data-value="m4a">M4A Codec</button>
-                <button class="seg-pill" data-value="mp3">MP3 Codec</button>
+              <div class="m3-segmented-button" id="audioGroup">
+                <button class="m3-segment active" data-value="m4a">M4A</button>
+                <button class="m3-segment" data-value="mp3">MP3</button>
               </div>
             </div>
+
           </div>
 
-          <!-- Primary Actions -->
-          <div class="grid-actions">
-            <button id="previewBtn" class="btn btn-glass">
-              <span>👁️</span> Preview Metadata
+          <!-- M3 Primary Action Buttons -->
+          <div class="m3-actions-row">
+            <button id="previewBtn" class="m3-btn-outlined full-flex">
+              <span class="material-symbols-outlined">visibility</span>
+              <span>Preview Metadata</span>
             </button>
-            <button id="downloadBtn" class="btn btn-gradient">
-              <span>⚡</span> Start Download
+            <button id="downloadBtn" class="m3-btn-filled full-flex">
+              <span class="material-symbols-outlined">download</span>
+              <span>Download</span>
             </button>
           </div>
         </div>
 
-        <!-- Live Metadata Inspection Card -->
-        <div id="previewCard" class="card preview-card hidden">
-          <div class="preview-badge-header">
-            <span class="badge-tag">MEDIA PREVIEW READY</span>
-            <span class="media-type-tag" id="previewPlatformTag">X / Twitter</span>
+        <!-- M3 Metadata Pop-Out Card -->
+        <div id="previewCard" class="m3-card preview-card hidden">
+          <div class="m3-card-header">
+            <span class="m3-badge-primary">PREVIEW READY</span>
+            <span class="m3-label-small" id="previewPlatformTag">X / Twitter</span>
           </div>
-          <div class="preview-media-row">
-            <img id="previewThumbnail" class="preview-thumb-img hidden" src="" alt="Video Thumbnail">
-            <div class="preview-info-box">
-              <h3 id="previewTitle" class="preview-title">Video Title Loading...</h3>
+
+          <div class="preview-media-content">
+            <img id="previewThumbnail" class="preview-thumbnail hidden" src="" alt="Thumbnail">
+            <div class="preview-text-content">
+              <h3 id="previewTitle" class="m3-title-small">Video Title Loading...</h3>
             </div>
           </div>
-          
-          <div class="metadata-grid">
-            <div class="meta-item">
-              <span class="meta-label">Uploader</span>
-              <strong id="previewUploader" class="meta-val">--</strong>
+
+          <div class="m3-meta-grid">
+            <div class="m3-meta-box">
+              <span class="m3-label-small">Uploader</span>
+              <strong class="m3-body-medium" id="previewUploader">--</strong>
             </div>
-            <div class="meta-item">
-              <span class="meta-label">Duration</span>
-              <strong id="previewDuration" class="meta-val">--</strong>
+            <div class="m3-meta-box">
+              <span class="m3-label-small">Duration</span>
+              <strong class="m3-body-medium" id="previewDuration">--</strong>
             </div>
-            <div class="meta-item">
-              <span class="meta-label">Views</span>
-              <strong id="previewViews" class="meta-val">--</strong>
+            <div class="m3-meta-box">
+              <span class="m3-label-small">Views</span>
+              <strong class="m3-body-medium" id="previewViews">--</strong>
             </div>
           </div>
         </div>
@@ -171,104 +184,62 @@
       </section>
 
 
-      <!-- ================= 2. LIBRARY & HISTORY VIEW ================= -->
-      <section id="tab-history" class="view-tab hidden">
-        <div class="view-header">
-          <h2>Media Library</h2>
-          <button id="clearHistoryBtn" class="text-btn">Clear All</button>
+      <!-- ================= LIBRARY VIEW ================= -->
+      <section id="tab-history" class="m3-view-tab hidden">
+        <div class="m3-view-header">
+          <h2 class="m3-title-large">Media Library</h2>
+          <button id="clearHistoryBtn" class="m3-btn-text">Clear All</button>
         </div>
 
-        <!-- Library Filter Bar -->
-        <div class="library-filter-bar">
-          <button class="filter-pill active" data-filter="all">All Media</button>
-          <button class="filter-pill" data-filter="video">Videos</button>
-          <button class="filter-pill" data-filter="audio">Audio</button>
-          <button class="filter-pill" data-filter="completed">Completed</button>
+        <div class="m3-filter-chips">
+          <button class="m3-filter-chip active" data-filter="all">All Files</button>
+          <button class="m3-filter-chip" data-filter="video">Videos</button>
+          <button class="m3-filter-chip" data-filter="audio">Audio</button>
+          <button class="m3-filter-chip" data-filter="completed">Completed</button>
         </div>
 
-        <!-- Native In-Feed Ad Banner -->
-        <div class="ad-native-feed">
-          <span class="ad-badge">Sponsored</span>
-          <div class="ad-native-content">
-            <div class="ad-thumb">🎮</div>
-            <div class="ad-native-text">
-              <strong>Top Mobile Games 2026</strong>
-              <span>Play instantly with zero download required.</span>
-            </div>
-            <button class="ad-btn-sm">Play</button>
-          </div>
-        </div>
-
-        <!-- Download Queue / History List -->
-        <div id="queueList" class="queue-container">
-          <div class="empty-library">
-            <div class="empty-icon">📁</div>
-            <h3>Your library is empty</h3>
-            <p>Paste a video link on the Saver tab to start downloading media.</p>
+        <div id="queueList" class="m3-queue-list">
+          <div class="m3-empty-state">
+            <span class="material-symbols-outlined empty-icon">folder_open</span>
+            <h3 class="m3-title-medium">No media files saved yet</h3>
+            <p class="m3-body-small">Paste a link on the Saver tab to start downloading.</p>
           </div>
         </div>
       </section>
 
 
-      <!-- ================= 3. PLATFORMS & TUTORIAL VIEW ================= -->
-      <section id="tab-platforms" class="view-tab hidden">
-        <div class="view-header">
-          <h2>Supported Platforms</h2>
+      <!-- ================= GUIDE VIEW ================= -->
+      <section id="tab-platforms" class="m3-view-tab hidden">
+        <div class="m3-view-header">
+          <h2 class="m3-title-large">User Guide</h2>
         </div>
 
-        <div class="card glass-card">
-          <h3>How to Save Social Media Videos</h3>
-          <p class="sub-text">Follow these quick steps to download videos from any platform:</p>
+        <div class="m3-card">
+          <h3 class="m3-title-medium">How to Download Videos</h3>
+          <p class="m3-body-small">Download media from your favorite platforms in 3 easy steps:</p>
 
-          <div class="guide-steps">
-            <div class="step-card">
-              <div class="step-num">1</div>
-              <div class="step-info">
-                <strong>Open Social App</strong>
-                <span>Open X (Twitter), TikTok, Instagram, or Reddit and find your video.</span>
-              </div>
-            </div>
-
-            <div class="step-card">
-              <div class="step-num">2</div>
-              <div class="step-info">
-                <strong>Copy Video Link</strong>
-                <span>Tap the <strong>Share</strong> button and choose <strong>Copy Link</strong>.</span>
+          <div class="m3-step-list">
+            <div class="m3-step-item">
+              <div class="m3-step-number">1</div>
+              <div class="m3-step-text">
+                <strong class="m3-body-medium">Copy Link</strong>
+                <span class="m3-body-small">Open X (Twitter), TikTok, or Instagram and copy the video share link.</span>
               </div>
             </div>
 
-            <div class="step-card">
-              <div class="step-num">3</div>
-              <div class="step-info">
-                <strong>Paste in X Saver Pro</strong>
-                <span>Open this app — your copied link will automatically be detected for download!</span>
+            <div class="m3-step-item">
+              <div class="m3-step-number">2</div>
+              <div class="m3-step-text">
+                <strong class="m3-body-medium">Auto-Detect & Preview</strong>
+                <span class="m3-body-small">Open VidDownloader — your copied link automatically pulls the video preview.</span>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div class="card glass-card margin-top">
-          <h3>Platform Features & Compatibility</h3>
-          <div class="platform-feature-list">
-            <div class="platform-row">
-              <div class="platform-icon-box twitter">𝕏</div>
-              <div class="platform-detail">
-                <strong>X / Twitter</strong>
-                <span>Supports 1080p, 720p, 480p videos & MP3 extractions.</span>
-              </div>
-            </div>
-            <div class="platform-row">
-              <div class="platform-icon-box instagram">📸</div>
-              <div class="platform-detail">
-                <strong>Instagram Reels & Posts</strong>
-                <span>Direct HD MP4 download with zero quality loss.</span>
-              </div>
-            </div>
-            <div class="platform-row">
-              <div class="platform-icon-box tiktok">🎵</div>
-              <div class="platform-detail">
-                <strong>TikTok Videos</strong>
-                <span>Clean video saving and audio soundtrack extraction.</span>
+            <div class="m3-step-item">
+              <div class="m3-step-number">3</div>
+              <div class="m3-step-text">
+                <strong class="m3-body-medium">Download & Save</strong>
+                <span class="m3-body-small">Choose your format and quality, then tap Download to save to your library.</span>
               </div>
             </div>
           </div>
@@ -276,70 +247,60 @@
       </section>
 
 
-      <!-- ================= 4. SETTINGS & PRO VIEW ================= -->
-      <section id="tab-settings" class="view-tab hidden">
-        <div class="view-header">
-          <h2>App Settings & Pro</h2>
+      <!-- ================= SETTINGS VIEW ================= -->
+      <section id="tab-settings" class="m3-view-tab hidden">
+        <div class="m3-view-header">
+          <h2 class="m3-title-large">Settings</h2>
         </div>
 
-        <!-- Go Pro Hero Card -->
-        <div class="card pro-card">
-          <div class="pro-header">
-            <span class="pro-crown">👑</span>
+        <div class="m3-card m3-pro-card">
+          <div class="pro-card-body">
+            <span class="material-symbols-outlined pro-icon">workspace_premium</span>
             <div>
-              <h3>X Saver Pro Unlimited</h3>
-              <p>Ad-Free Downloads • 4K Quality • Fast Servers</p>
+              <h3 class="m3-title-medium">VidDownloader Pro</h3>
+              <p class="m3-body-small">Ad-Free • Fast Extractions • High Definition</p>
             </div>
           </div>
-          <button id="upgradeProBtn" class="btn btn-pro-gradient full-width">
-            Upgrade to Pro for $2.99 / Lifetime
+          <button id="upgradeProBtn" class="m3-btn-filled full-width">
+            Upgrade for $2.99 / Lifetime
           </button>
         </div>
 
-        <div class="card glass-card margin-top">
-          <h3>Preferences</h3>
-          <div class="setting-item">
-            <div class="setting-text">
-              <strong>Auto-Detect Clipboard Links</strong>
-              <span>Automatically prompt when app opens with a copied link</span>
+        <div class="m3-card">
+          <h3 class="m3-title-medium">Preferences</h3>
+          
+          <div class="m3-list-item">
+            <div class="m3-list-text">
+              <strong class="m3-body-medium">Auto-Detect Clipboard Links</strong>
+              <span class="m3-body-small">Prompt when opening app with copied link</span>
             </div>
-            <label class="toggle-switch">
+            <label class="m3-switch">
               <input type="checkbox" id="autoClipboardToggle" checked>
-              <span class="slider"></span>
+              <span class="m3-switch-slider"></span>
             </label>
           </div>
 
-          <div class="setting-item">
-            <div class="setting-text">
-              <strong>Simulate AdMob Ads</strong>
-              <span>Show simulated AdMob interstitial countdowns on download</span>
+          <div class="m3-list-item">
+            <div class="m3-list-text">
+              <strong class="m3-body-medium">Simulate AdMob Ads</strong>
+              <span class="m3-body-small">Show simulated AdMob interstitials</span>
             </div>
-            <label class="toggle-switch">
+            <label class="m3-switch">
               <input type="checkbox" id="adSimToggle" checked>
-              <span class="slider"></span>
+              <span class="m3-switch-slider"></span>
             </label>
-          </div>
-
-          <div class="setting-item">
-            <div class="setting-text">
-              <strong>Theme Mode</strong>
-              <span>Default Cyberpunk OLED Dark</span>
-            </div>
-            <span class="setting-badge">OLED Dark</span>
           </div>
         </div>
 
-        <div class="card glass-card margin-top">
-          <h3>Storage & Cache</h3>
-          <div class="storage-bar-container">
-            <div class="storage-label">
-              <span>App Local Cache</span>
-              <strong>14.2 MB</strong>
-            </div>
-            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: 15%;"></div></div>
+        <div class="m3-card">
+          <h3 class="m3-title-medium">Storage & Cache</h3>
+          <div class="m3-storage-info">
+            <span class="m3-body-small">Cache Usage</span>
+            <strong class="m3-body-small">14.2 MB</strong>
           </div>
-          <button id="clearCacheBtn" class="btn btn-glass full-width margin-top-sm">
-            <span>🧹</span> Clear App Cache & History
+          <button id="clearCacheBtn" class="m3-btn-outlined full-width">
+            <span class="material-symbols-outlined">cleaning_services</span>
+            <span>Clear App Cache & History</span>
           </button>
         </div>
       </section>
@@ -347,89 +308,79 @@
     </main>
 
 
-    <!-- ================= MODALS & POPUPS ================= -->
-
-    <!-- Interstitial Ad Unit Modal Simulator -->
-    <div id="interstitialModal" class="modal-backdrop hidden">
-      <div class="modal-card ad-modal">
-        <div class="ad-modal-header">
-          <span class="ad-sponsor-tag">GOOGLE ADMOB INTERSTITIAL</span>
-          <span class="ad-countdown" id="adCountdownText">5s</span>
+    <!-- M3 Interstitial Ad Modal -->
+    <div id="interstitialModal" class="m3-modal-backdrop hidden">
+      <div class="m3-dialog">
+        <div class="m3-dialog-header">
+          <span class="m3-badge-secondary">ADMOB INTERSTITIAL AD</span>
+          <span class="m3-label-small" id="adCountdownText">5s</span>
         </div>
-        
-        <div class="ad-modal-body">
-          <div class="ad-hero-graphic">🎁</div>
-          <h3>Unlock Ultra HD 1080p Downloads</h3>
-          <p>Support free media extractions by viewing sponsored offers.</p>
-          <div class="ad-progress-track">
-            <div id="adTimerBar" class="ad-progress-fill"></div>
+        <div class="m3-dialog-body">
+          <span class="material-symbols-outlined ad-dialog-icon">redeem</span>
+          <h3 class="m3-title-medium">Unlock High Quality Media</h3>
+          <p class="m3-body-small">Support free video downloading by viewing sponsored offers.</p>
+          <div class="m3-progress-indicator">
+            <div id="adTimerBar" class="m3-progress-bar-fill"></div>
           </div>
         </div>
-
-        <button id="closeAdBtn" class="btn btn-primary full-width" disabled>
+        <button id="closeAdBtn" class="m3-btn-filled full-width" disabled>
           Please wait (5s)...
         </button>
       </div>
     </div>
 
 
-    <!-- Rewarded Video Ad Modal Simulator -->
-    <div id="rewardedModal" class="modal-backdrop hidden">
-      <div class="modal-card ad-modal">
-        <div class="ad-modal-header">
-          <span class="ad-sponsor-tag">REWARDED AD BONUS</span>
+    <!-- Video Player Modal -->
+    <div id="playerModal" class="m3-modal-backdrop hidden">
+      <div class="m3-dialog player-dialog">
+        <div class="m3-dialog-header">
+          <h3 id="playerTitle" class="m3-title-small">Media Player</h3>
+          <button id="closePlayerBtn" class="m3-icon-btn">
+            <span class="material-symbols-outlined">close</span>
+          </button>
         </div>
-        <div class="ad-modal-body">
-          <div class="ad-hero-graphic">⭐</div>
-          <h3>Watch Video to Remove Watermarks</h3>
-          <p>Complete a 10-second sponsor clip to unlock 4K download & MP3 converter.</p>
-        </div>
-        <div class="grid-actions">
-          <button id="skipRewardBtn" class="btn btn-glass">Skip Bonus</button>
-          <button id="watchRewardBtn" class="btn btn-gradient">Watch Ad (+Bonus)</button>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- In-App Video Player Modal -->
-    <div id="playerModal" class="modal-backdrop hidden">
-      <div class="modal-card player-modal-card">
-        <div class="modal-header">
-          <h3 id="playerTitle">Media Playback</h3>
-          <button id="closePlayerBtn" class="icon-close-btn">✕</button>
-        </div>
-        <div class="video-wrapper">
+        <div class="video-container">
           <video id="videoPlayer" controls autoplay></video>
         </div>
       </div>
     </div>
 
 
-    <!-- Universal Floating Toast Notification -->
-    <div id="toast" class="toast hidden">
-      <span id="toastIcon">✨</span>
-      <span id="toastMessage">Action completed</span>
+    <!-- M3 Snackbar Toast -->
+    <div id="toast" class="m3-snackbar hidden">
+      <span class="material-symbols-outlined" id="toastIcon">check_circle</span>
+      <span class="m3-body-medium" id="toastMessage">Action completed</span>
     </div>
 
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="bottom-nav">
-      <button class="nav-btn active" data-tab="tab-saver">
-        <span class="nav-icon">⚡</span>
-        <span class="nav-label">Saver</span>
+    <!-- M3 Navigation Bar (Bottom Navigation) -->
+    <nav class="m3-navigation-bar">
+      <button class="m3-nav-item active" data-tab="tab-saver">
+        <div class="m3-nav-icon-container">
+          <span class="material-symbols-outlined">download_for_offline</span>
+        </div>
+        <span class="m3-label-small">Saver</span>
       </button>
-      <button class="nav-btn" data-tab="tab-history">
-        <span class="nav-icon">📂</span>
-        <span class="nav-label">Library</span>
+      
+      <button class="m3-nav-item" data-tab="tab-history">
+        <div class="m3-nav-icon-container">
+          <span class="material-symbols-outlined">folder</span>
+        </div>
+        <span class="m3-label-small">Library</span>
       </button>
-      <button class="nav-btn" data-tab="tab-platforms">
-        <span class="nav-icon">🚀</span>
-        <span class="nav-label">Guide</span>
+      
+      <button class="m3-nav-item" data-tab="tab-platforms">
+        <div class="m3-nav-icon-container">
+          <span class="material-symbols-outlined">help</span>
+        </div>
+        <span class="m3-label-small">Guide</span>
       </button>
-      <button class="nav-btn" data-tab="tab-settings">
-        <span class="nav-icon">⚙️</span>
-        <span class="nav-label">Settings</span>
+      
+      <button class="m3-nav-item" data-tab="tab-settings">
+        <div class="m3-nav-icon-container">
+          <span class="material-symbols-outlined">settings</span>
+        </div>
+        <span class="m3-label-small">Settings</span>
       </button>
     </nav>
 
