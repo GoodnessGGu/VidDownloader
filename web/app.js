@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Navigation Tabs
-  const navBtns = document.querySelectorAll('.m3-nav-item');
-  const viewTabs = document.querySelectorAll('.m3-view-tab');
+  const navBtns = document.querySelectorAll('.nav-item');
+  const viewTabs = document.querySelectorAll('.view-tab');
 
   // Input Controls
   const urlInput = document.getElementById('urlInput');
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Library / Queue Elements
   const queueList = document.getElementById('queueList');
   const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-  const filterPills = document.querySelectorAll('.m3-filter-chips .m3-filter-chip');
+  const filterPills = document.querySelectorAll('.filter-pills .filter-pill');
 
   // Ad & Modals Elements
   const interstitialModal = document.getElementById('interstitialModal');
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let downloadCount = 0;
   let autoPreviewTimeout = null;
 
-  // M3 Tab Navigation
+  // Tab Navigation Handling
   navBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetTab = btn.dataset.tab;
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // M3 Segmented Buttons Selection Helper
+  // Segmented Control Helper
   setupSegmentGroup('formatGroup', (val, labelText) => {
     selectedFormat = val;
     document.getElementById('selectedFormatLabel').innerText = labelText;
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function setupSegmentGroup(groupId, callback) {
     const group = document.getElementById(groupId);
     if (!group) return;
-    const segments = group.querySelectorAll('.m3-segment');
+    const segments = group.querySelectorAll('.seg-btn');
     segments.forEach(segment => {
       segment.addEventListener('click', () => {
         segments.forEach(s => s.classList.remove('active'));
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Auto Platform Detection & Auto Preview
+  // Auto Platform Detection & Auto Preview Pop-Out
   urlInput.addEventListener('paste', () => {
     setTimeout(() => {
       const pasted = urlInput.value.trim();
@@ -132,8 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
       platformDetector.innerText = '🤖 Reddit Link';
       platformDetector.style.color = '#ff4500';
     } else {
-      platformDetector.innerText = 'Auto-detect social link';
-      platformDetector.style.color = 'var(--m3-text-tertiary)';
+      platformDetector.innerText = 'Universal Saver';
+      platformDetector.style.color = 'var(--accent-cyan)';
     }
   }
 
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
           previewThumbnail.classList.add('hidden');
         }
 
-        showSnackbar('Video preview popped out!', 'check_circle');
+        showToast('Video preview popped out!', '✨');
       } else {
         previewTitle.innerText = 'Ready to download';
       }
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     urlInput.value = link;
     detectPlatform(link);
     triggerAutoPreview(link);
-    showSnackbar('Sample link loaded!', 'auto_fix_high');
+    showToast('Sample link loaded!', '✨');
   });
 
   // Paste Clipboard Action
@@ -204,13 +204,13 @@ document.addEventListener('DOMContentLoaded', () => {
           urlInput.value = text.trim();
           detectPlatform(urlInput.value);
           triggerAutoPreview(urlInput.value);
-          showSnackbar('Pasted from clipboard!', 'content_paste');
+          showToast('Pasted from clipboard!', '📋');
         }
       } else {
-        showSnackbar('Clipboard access unavailable', 'warning');
+        showToast('Clipboard access unavailable', '⚠️');
       }
     } catch (e) {
-      showSnackbar('Clipboard access denied', 'warning');
+      showToast('Clipboard access denied', '⚠️');
     }
   });
 
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     detectPlatform('');
   });
 
-  // Smart Clipboard Prompt Simulator
+  // Clipboard Smart Prompt Simulator
   setTimeout(() => {
     if (autoClipboardToggle && autoClipboardToggle.checked) {
       clipboardBanner.classList.remove('hidden');
@@ -237,14 +237,14 @@ document.addEventListener('DOMContentLoaded', () => {
     detectPlatform(urlInput.value);
     triggerAutoPreview(urlInput.value);
     clipboardBanner.classList.add('hidden');
-    showSnackbar('Link pasted!', 'download');
+    showToast('Link pasted!', '⚡');
   });
 
-  // Manual Preview Metadata Button
+  // Manual Preview Button
   previewBtn.addEventListener('click', () => {
     const raw = urlInput.value.trim();
     if (!raw) {
-      showSnackbar('Please paste a video URL first', 'warning');
+      showToast('Please paste a video URL first', '⚠️');
       return;
     }
     triggerAutoPreview(raw);
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
   downloadBtn.addEventListener('click', () => {
     const raw = urlInput.value.trim();
     if (!raw) {
-      showSnackbar('Please paste a video URL first', 'warning');
+      showToast('Please paste a video URL first', '⚠️');
       return;
     }
 
@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     historyItems.push(itemObj);
     renderQueue();
-    showSnackbar('Download started!', 'downloading');
+    showToast('Download started!', '⚡');
 
     try {
       const res = await fetch('/api/download', {
@@ -342,18 +342,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         renderQueue();
-        showSnackbar('Download completed!', 'check_circle');
+        showToast('Download completed!', '🎉');
       } else {
         itemObj.status = 'Failed';
         itemObj.progress = 0;
         renderQueue();
-        showSnackbar(data.detail || 'Download failed', 'error');
+        showToast(data.detail || 'Download failed', '❌');
       }
     } catch (err) {
       itemObj.status = 'Failed';
       itemObj.progress = 0;
       renderQueue();
-      showSnackbar('Server connection error.', 'error');
+      showToast('Server connection error.', '❌');
     }
   }
 
@@ -363,10 +363,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (historyItems.length === 0) {
       queueList.innerHTML = `
-        <div class="m3-empty-state">
-          <span class="material-symbols-outlined empty-icon">folder_open</span>
-          <h3 class="m3-title-medium">No media files saved yet</h3>
-          <p class="m3-body-small">Paste a link on the Saver tab to start downloading.</p>
+        <div class="empty-state">
+          <div class="empty-icon">📁</div>
+          <h3>Your library is empty</h3>
+          <p>Paste a video link on the Saver tab to start downloading media.</p>
         </div>
       `;
       return;
@@ -381,26 +381,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filtered.slice().reverse().forEach(item => {
       const card = document.createElement('div');
-      card.className = 'm3-queue-card';
+      card.className = 'queue-item-card';
       
       let actionButtons = '';
       if (item.status === 'Completed' && item.fileUrl) {
         actionButtons = `
-          <button class="m3-btn-text" onclick="playMedia('${encodeURIComponent(item.title)}', '${item.fileUrl}')">▶ Play</button>
-          <a href="${item.fileUrl}" download="${item.filename || 'video.mp4'}" class="m3-btn-filled-tonal" style="text-decoration:none;">💾 Save</a>
+          <button class="btn btn-secondary btn-sm" onclick="playMedia('${encodeURIComponent(item.title)}', '${item.fileUrl}')">▶ Play</button>
+          <a href="${item.fileUrl}" download="${item.filename || 'video.mp4'}" class="btn btn-primary btn-sm" style="text-decoration:none;">💾 Save</a>
         `;
       }
 
       card.innerHTML = `
-        <div class="m3-queue-row">
-          <span class="m3-body-medium m3-queue-title">${item.title}</span>
-          <span class="m3-badge-primary">${item.status}</span>
+        <div class="queue-row">
+          <span class="queue-item-title">${item.title}</span>
+          <span class="status-tag">${item.status}</span>
         </div>
-        <div class="m3-progress-track">
-          <div class="m3-progress-fill" style="width: ${item.progress}%"></div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: ${item.progress}%"></div>
         </div>
-        <div class="m3-queue-row">
-          <span class="m3-label-small">${item.format.toUpperCase()} • ${item.quality.toUpperCase()}</span>
+        <div class="queue-row">
+          <span class="sub-text">${item.format.toUpperCase()} • ${item.quality.toUpperCase()}</span>
           <div>${actionButtons}</div>
         </div>
       `;
@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Global Play Media Handler
+  // Global Play Media Modal Handler
   window.playMedia = (titleEncoded, fileUrl) => {
     playerTitle.innerText = decodeURIComponent(titleEncoded);
     videoPlayer.src = fileUrl;
@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
   clearHistoryBtn.addEventListener('click', () => {
     historyItems = [];
     renderQueue();
-    showSnackbar('Library cleared', 'cleaning_services');
+    showToast('Library cleared', '🧹');
   });
 
   // Settings & Utilities
@@ -443,15 +443,15 @@ document.addEventListener('DOMContentLoaded', () => {
     urlInput.value = '';
     previewCard.classList.add('hidden');
     renderQueue();
-    showSnackbar('App cache & history cleared!', 'cleaning_services');
+    showToast('App cache & history cleared!', '🧹');
   });
 
   goProBtn.addEventListener('click', () => {
-    showSnackbar('VidDownloader Pro Unlimited active!', 'workspace_premium');
+    showToast('VidDownloader Pro Unlimited unlocked!', '👑');
   });
 
-  // M3 Snackbar System
-  function showSnackbar(message, icon = 'check_circle') {
+  // Toast Notification System
+  function showToast(message, icon = '✨') {
     const toast = document.getElementById('toast');
     const toastMsg = document.getElementById('toastMessage');
     const toastIcon = document.getElementById('toastIcon');
