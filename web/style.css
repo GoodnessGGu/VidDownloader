@@ -564,6 +564,99 @@ textarea:focus {
   word-break: break-all;
 }
 
+/* Active Download Progress Card */
+.active-download-card {
+  border-color: var(--accent-primary);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(17, 25, 39, 0.95) 100%);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.active-download-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.3);
+}
+
+.active-dl-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.active-dl-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  letter-spacing: 1px;
+}
+
+.speed-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background-color: var(--bg-pill);
+  color: var(--accent-cyan);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+}
+
+.active-dl-body {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.active-dl-thumb {
+  width: 80px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-input);
+}
+
+.active-dl-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.active-dl-info h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.active-dl-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.status-sub {
+  color: var(--text-muted);
+}
+
+.active-dl-status-row strong {
+  color: var(--accent-cyan);
+}
+
+.active-dl-footer {
+  text-align: right;
+}
+
+.tap-hint {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-cyan);
+}
+
 /* Library & Queue */
 .filter-pills {
   display: flex;

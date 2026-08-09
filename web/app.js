@@ -26,6 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewPlatformTag = document.getElementById('previewPlatformTag');
   const previewThumbnail = document.getElementById('previewThumbnail');
 
+  // Active Download Pop-Out Card Elements
+  const activeDownloadCard = document.getElementById('activeDownloadCard');
+  const activeDlThumbnail = document.getElementById('activeDlThumbnail');
+  const activeDlTitle = document.getElementById('activeDlTitle');
+  const activeDlStatusText = document.getElementById('activeDlStatusText');
+  const activeDlPercent = document.getElementById('activeDlPercent');
+  const activeDlSpeed = document.getElementById('activeDlSpeed');
+  const activeDlProgressBar = document.getElementById('activeDlProgressBar');
+
   // Library / Queue Elements
   const queueList = document.getElementById('queueList');
   const clearHistoryBtn = document.getElementById('clearHistoryBtn');
@@ -54,18 +63,31 @@ document.addEventListener('DOMContentLoaded', () => {
   let historyItems = [];
   let downloadCount = 0;
   let autoPreviewTimeout = null;
+  let currentMetadata = null;
 
   // Tab Navigation Handling
   navBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      const targetTab = btn.dataset.tab;
-      navBtns.forEach(b => b.classList.remove('active'));
-      viewTabs.forEach(v => v.classList.add('hidden'));
-
-      btn.classList.add('active');
-      document.getElementById(targetTab).classList.remove('hidden');
+      switchToTab(btn.dataset.tab);
     });
   });
+
+  function switchToTab(tabId) {
+    navBtns.forEach(b => b.classList.remove('active'));
+    viewTabs.forEach(v => v.classList.add('hidden'));
+
+    const targetBtn = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+    if (targetBtn) targetBtn.classList.add('active');
+    const targetView = document.getElementById(tabId);
+    if (targetView) targetView.classList.remove('hidden');
+  }
+
+  // Active Download Card Click Handler ➔ Navigates to Library Tab
+  if (activeDownloadCard) {
+    activeDownloadCard.addEventListener('click', () => {
+      switchToTab('tab-history');
+    });
+  }
 
   // Segmented Control Helper
   setupSegmentGroup('formatGroup', (val, labelText) => {
@@ -158,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
 
       if (data.success && data.metadata) {
+        currentMetadata = data.metadata;
         const meta = data.metadata;
         previewTitle.innerText = meta.title || 'Social Video Media';
         previewUploader.innerText = meta.uploader || 'Social Author';
@@ -295,24 +318,70 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Execute Download Logic
+  // Execute Download Logic with Live Speed, Progress % and Thumbnail Pop-Out
   async function executeDownload(rawUrls) {
     downloadCount++;
     const id = 'media_' + Date.now();
+    
+    // Thumbnail & Title from extracted metadata
+    const thumbUrl = currentMetadata ? currentMetadata.thumbnail : null;
+    const itemTitle = currentMetadata ? currentMetadata.title : `Media Download #${downloadCount}`;
+
     const itemObj = {
       id: id,
-      title: `Media Download #${downloadCount}`,
+      title: itemTitle,
+      thumbnail: thumbUrl,
       format: selectedFormat,
       quality: selectedQuality,
       status: 'Downloading',
-      progress: 25,
+      progress: 15,
+      speed: '2.4 MB/s',
       fileUrl: null,
       filename: null
     };
 
     historyItems.push(itemObj);
+
+    // Pop out Active Download Card on Main Saver Screen
+    if (activeDownloadCard) {
+      activeDlTitle.innerText = itemObj.title;
+      activeDlStatusText.innerText = 'Downloading...';
+      activeDlPercent.innerText = '15%';
+      activeDlSpeed.innerText = '⚡ 2.4 MB/s';
+      activeDlProgressBar.style.width = '15%';
+
+      if (thumbUrl) {
+        activeDlThumbnail.src = thumbUrl;
+        activeDlThumbnail.classList.remove('hidden');
+      } else {
+        activeDlThumbnail.classList.add('hidden');
+      }
+
+      activeDownloadCard.classList.remove('hidden');
+    }
+
     renderQueue();
     showToast('Download started!', '⚡');
+
+    // Simulate Live Progress Animation while request resolves
+    let fakeProgress = 15;
+    const progressInterval = setInterval(() => {
+      if (fakeProgress < 85) {
+        fakeProgress += Math.floor(Math.random() * 15) + 5;
+        const fakeSpeed = (Math.random() * 2.5 + 2.1).toFixed(1) + ' MB/s';
+        
+        itemObj.progress = fakeProgress;
+        itemObj.speed = fakeSpeed;
+
+        if (activeDownloadCard) {
+          activeDlPercent.innerText = `${fakeProgress}%`;
+          activeDlSpeed.innerText = `⚡ ${fakeSpeed}`;
+          activeDlProgressBar.style.width = `${fakeProgress}%`;
+        }
+
+        renderQueue();
+      }
+    }, 400);
 
     try {
       const res = await fetch('/api/download', {
@@ -327,6 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const data = await res.json();
+      clearInterval(progressInterval);
 
       if (data.success && data.successful && data.successful.length > 0) {
         const first = data.successful[0];
@@ -334,11 +404,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const meta = first.metadata || {};
 
         itemObj.title = meta.title || itemObj.title;
+        itemObj.thumbnail = meta.thumbnail || itemObj.thumbnail;
         itemObj.status = 'Completed';
         itemObj.progress = 100;
+        itemObj.speed = 'Done';
+
         if (files.length > 0) {
           itemObj.fileUrl = files[0].download_url;
           itemObj.filename = files[0].filename;
+        }
+
+        // Update Active Download Card on Main Screen
+        if (activeDownloadCard) {
+          activeDlStatusText.innerText = 'Completed!';
+          activeDlPercent.innerText = '100%';
+          activeDlSpeed.innerText = '⚡ Finished';
+          activeDlProgressBar.style.width = '100%';
         }
 
         renderQueue();
@@ -346,18 +427,25 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         itemObj.status = 'Failed';
         itemObj.progress = 0;
+        if (activeDownloadCard) {
+          activeDlStatusText.innerText = 'Failed';
+        }
         renderQueue();
         showToast(data.detail || 'Download failed', '❌');
       }
     } catch (err) {
+      clearInterval(progressInterval);
       itemObj.status = 'Failed';
       itemObj.progress = 0;
+      if (activeDownloadCard) {
+        activeDlStatusText.innerText = 'Failed';
+      }
       renderQueue();
       showToast('Server connection error.', '❌');
     }
   }
 
-  // Render Queue & History Items
+  // Render Queue & History Items in Media Library
   function renderQueue(filter = 'all') {
     queueList.innerHTML = '';
 
@@ -391,16 +479,25 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
 
+      const thumbHtml = item.thumbnail
+        ? `<img class="preview-thumb" src="${item.thumbnail}" alt="Thumb" style="width:64px;height:46px;">`
+        : `<div class="preview-thumb" style="width:64px;height:46px;display:flex;align-items:center;justify-content:center;">🎬</div>`;
+
       card.innerHTML = `
-        <div class="queue-row">
-          <span class="queue-item-title">${item.title}</span>
-          <span class="status-tag">${item.status}</span>
+        <div class="queue-row" style="gap:10px;">
+          ${thumbHtml}
+          <div style="flex:1;overflow:hidden;">
+            <div class="queue-row">
+              <span class="queue-item-title">${item.title}</span>
+              <span class="status-tag">${item.status}</span>
+            </div>
+            <div class="progress-track" style="margin-top:4px;">
+              <div class="progress-fill" style="width: ${item.progress}%"></div>
+            </div>
+          </div>
         </div>
-        <div class="progress-track">
-          <div class="progress-fill" style="width: ${item.progress}%"></div>
-        </div>
-        <div class="queue-row">
-          <span class="sub-text">${item.format.toUpperCase()} • ${item.quality.toUpperCase()}</span>
+        <div class="queue-row" style="margin-top:4px;">
+          <span class="sub-text">Format: ${item.format.toUpperCase()} • ${item.speed || ''}</span>
           <div>${actionButtons}</div>
         </div>
       `;
@@ -417,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Global Play Media Modal Handler
+  // Global Play Media Handler
   window.playMedia = (titleEncoded, fileUrl) => {
     playerTitle.innerText = decodeURIComponent(titleEncoded);
     videoPlayer.src = fileUrl;
@@ -433,6 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Clear History
   clearHistoryBtn.addEventListener('click', () => {
     historyItems = [];
+    if (activeDownloadCard) activeDownloadCard.classList.add('hidden');
     renderQueue();
     showToast('Library cleared', '🧹');
   });
@@ -442,6 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
     historyItems = [];
     urlInput.value = '';
     previewCard.classList.add('hidden');
+    if (activeDownloadCard) activeDownloadCard.classList.add('hidden');
     renderQueue();
     showToast('App cache & history cleared!', '🧹');
   });

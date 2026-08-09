@@ -167,6 +167,31 @@
               <strong id="previewViews">--</strong>
             </div>
           </div>
+        <!-- Active Download Progress Pop-Out Card -->
+        <div id="activeDownloadCard" class="card active-download-card hidden">
+          <div class="active-dl-header">
+            <span class="active-dl-badge">DOWNLOADING MEDIA</span>
+            <span id="activeDlSpeed" class="speed-badge">⚡ 3.2 MB/s</span>
+          </div>
+
+          <div class="active-dl-body">
+            <img id="activeDlThumbnail" class="active-dl-thumb" src="" alt="Thumbnail">
+            <div class="active-dl-info">
+              <h3 id="activeDlTitle">Downloading Video...</h3>
+              <div class="active-dl-status-row">
+                <span id="activeDlStatusText" class="status-sub">Downloading...</span>
+                <strong id="activeDlPercent">0%</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-track">
+            <div id="activeDlProgressBar" class="progress-fill" style="width: 0%;"></div>
+          </div>
+
+          <div class="active-dl-footer">
+            <span class="tap-hint">Tap card to view in Media Library ➔</span>
+          </div>
         </div>
 
       </section>
