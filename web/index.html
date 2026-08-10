@@ -26,19 +26,6 @@
       </button>
     </header>
 
-    <!-- Sponsored Ad Unit Banner -->
-    <div class="ad-unit-card">
-      <span class="ad-tag">SPONSORED</span>
-      <div class="ad-content">
-        <div class="ad-icon-box">📢</div>
-        <div class="ad-info">
-          <strong>Google AdMob Banner</strong>
-          <span>Monetize video downloads with AdMob ads</span>
-        </div>
-        <button class="ad-btn">View Offer</button>
-      </div>
-    </div>
-
     <!-- Smart Clipboard Detection Prompt -->
     <div id="clipboardBanner" class="clipboard-card hidden">
       <div class="clip-icon">📋</div>
@@ -58,10 +45,10 @@
         
         <!-- Platform Chips -->
         <div class="platform-chips">
-          <button class="chip active" data-platform="twitter" title="Load X/Twitter Sample"><span class="dot twitter"></span> X / Twitter</button>
-          <button class="chip" data-platform="instagram" title="Load Instagram Sample"><span class="dot instagram"></span> Instagram</button>
-          <button class="chip" data-platform="tiktok" title="Load TikTok Sample"><span class="dot tiktok"></span> TikTok</button>
-          <button class="chip" data-platform="reddit" title="Load Reddit Sample"><span class="dot reddit"></span> Reddit</button>
+          <button class="chip active" data-platform="twitter"><span class="dot twitter"></span> X / Twitter</button>
+          <button class="chip" data-platform="instagram"><span class="dot instagram"></span> Instagram</button>
+          <button class="chip" data-platform="tiktok"><span class="dot tiktok"></span> TikTok</button>
+          <button class="chip" data-platform="reddit"><span class="dot reddit"></span> Reddit</button>
         </div>
 
         <!-- Input Glass Card -->
@@ -76,9 +63,6 @@
             <div class="input-actions">
               <button id="pasteBtn" class="btn btn-secondary btn-sm">
                 <span>📋</span> Paste
-              </button>
-              <button id="sampleLinkBtn" class="btn btn-ghost btn-sm">
-                <span>✨</span> Try Sample
               </button>
               <button id="clearBtn" class="btn-clear" title="Clear input">✕</button>
             </div>
@@ -128,12 +112,9 @@
 
           </div>
 
-          <!-- Primary Action Grid -->
-          <div class="action-grid">
-            <button id="previewBtn" class="btn btn-secondary">
-              <span>👁️</span> Preview Metadata
-            </button>
-            <button id="downloadBtn" class="btn btn-primary">
+          <!-- Primary Download Button -->
+          <div class="action-grid-single margin-top-sm">
+            <button id="downloadBtn" class="btn btn-primary full-width">
               <span>⚡</span> Start Download
             </button>
           </div>
@@ -245,23 +226,34 @@
           <h2>User Guide & FAQ</h2>
         </div>
 
-        <!-- 1-Tap Interactive Testers -->
         <div class="card">
-          <h3>Test Download Samples</h3>
-          <p class="sub-text">Tap any social platform to test live video extraction:</p>
-          <div class="sample-grid margin-top-sm">
-            <button class="btn btn-secondary btn-sm test-sample-btn" data-sample="x">
-              <span>𝕏</span> Test X / Twitter
-            </button>
-            <button class="btn btn-secondary btn-sm test-sample-btn" data-sample="instagram">
-              <span>📸</span> Test Instagram
-            </button>
-            <button class="btn btn-secondary btn-sm test-sample-btn" data-sample="tiktok">
-              <span>🎵</span> Test TikTok
-            </button>
-            <button class="btn btn-secondary btn-sm test-sample-btn" data-sample="reddit">
-              <span>🤖</span> Test Reddit
-            </button>
+          <h3>How to Save Videos</h3>
+          <p class="sub-text">Download videos from any platform in 3 easy steps:</p>
+
+          <div class="guide-list">
+            <div class="guide-item">
+              <div class="step-badge">1</div>
+              <div class="step-text">
+                <strong>Copy Share Link</strong>
+                <span>Open X (Twitter), TikTok, Instagram, or Reddit and copy the video URL.</span>
+              </div>
+            </div>
+
+            <div class="guide-item">
+              <div class="step-badge">2</div>
+              <div class="step-text">
+                <strong>Paste in VidDownloader</strong>
+                <span>Open VidDownloader — the app automatically extracts thumbnail & video details.</span>
+              </div>
+            </div>
+
+            <div class="guide-item">
+              <div class="step-badge">3</div>
+              <div class="step-text">
+                <strong>Download & Save</strong>
+                <span>Select format (MP4/MP3) and tap Download to save to your local library.</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -300,7 +292,7 @@
             <div class="pro-icon">👑</div>
             <div>
               <h3>VidDownloader Pro</h3>
-              <p>Ad-Free • Fast Extractions • High Definition</p>
+              <p>Fast Extractions • High Definition</p>
             </div>
           </div>
           <button id="upgradeProBtn" class="btn btn-primary full-width margin-top-sm">
@@ -329,13 +321,10 @@
               <strong>Android Push Notifications</strong>
               <span>Pop-up alerts for download progress & completion</span>
             </div>
-            <div style="display:flex;gap:6px;align-items:center;">
-              <button id="testNotifBtn" class="btn btn-ghost btn-sm">Test</button>
-              <label class="switch">
-                <input type="checkbox" id="notifToggle" checked>
-                <span class="slider"></span>
-              </label>
-            </div>
+            <label class="switch">
+              <input type="checkbox" id="notifToggle" checked>
+              <span class="slider"></span>
+            </label>
           </div>
 
           <div class="setting-row">
@@ -361,17 +350,6 @@
               <span class="slider"></span>
             </label>
           </div>
-
-          <div class="setting-row">
-            <div>
-              <strong>Simulate AdMob Interstitials</strong>
-              <span>Show simulated AdMob countdowns on download</span>
-            </div>
-            <label class="switch">
-              <input type="checkbox" id="adSimToggle" checked>
-              <span class="slider"></span>
-            </label>
-          </div>
         </div>
 
         <div class="card margin-top">
@@ -394,28 +372,6 @@
       </section>
 
     </main>
-
-
-    <!-- Interstitial Ad Unit Modal -->
-    <div id="interstitialModal" class="modal-backdrop hidden">
-      <div class="modal-card">
-        <div class="modal-header-tag">
-          <span>ADMOB INTERSTITIAL AD</span>
-          <span id="adCountdownText" class="timer-badge">5s</span>
-        </div>
-        <div class="modal-body-content">
-          <div class="modal-icon">🎁</div>
-          <h3>Unlock High Definition Media</h3>
-          <p>Support free video extractions by viewing sponsored offers.</p>
-          <div class="progress-bar-track">
-            <div id="adTimerBar" class="progress-bar-fill"></div>
-          </div>
-        </div>
-        <button id="closeAdBtn" class="btn btn-primary full-width" disabled>
-          Please wait (5s)...
-        </button>
-      </div>
-    </div>
 
 
     <!-- Video Player Modal -->

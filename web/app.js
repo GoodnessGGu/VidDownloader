@@ -6,9 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Input Controls
   const urlInput = document.getElementById('urlInput');
   const pasteBtn = document.getElementById('pasteBtn');
-  const sampleLinkBtn = document.getElementById('sampleLinkBtn');
   const clearBtn = document.getElementById('clearBtn');
-  const previewBtn = document.getElementById('previewBtn');
   const downloadBtn = document.getElementById('downloadBtn');
   const platformDetector = document.getElementById('platformDetector');
 
@@ -45,15 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const emptyStateCta = document.getElementById('emptyStateCta');
 
   // Guide Elements
-  const testSampleBtns = document.querySelectorAll('.test-sample-btn');
   const platformChips = document.querySelectorAll('.platform-chips .chip');
 
-  // Ad & Modals Elements
-  const interstitialModal = document.getElementById('interstitialModal');
-  const adTimerBar = document.getElementById('adTimerBar');
-  const closeAdBtn = document.getElementById('closeAdBtn');
-  const adCountdownText = document.getElementById('adCountdownText');
-
+  // Modals & Player Elements
   const playerModal = document.getElementById('playerModal');
   const videoPlayer = document.getElementById('videoPlayer');
   const closePlayerBtn = document.getElementById('closePlayerBtn');
@@ -64,10 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeClipboardBtn = document.getElementById('closeClipboardBtn');
 
   // Settings & Theme Palette Elements
-  const adSimToggle = document.getElementById('adSimToggle');
   const autoClipboardToggle = document.getElementById('autoClipboardToggle');
   const notifToggle = document.getElementById('notifToggle');
-  const testNotifBtn = document.getElementById('testNotifBtn');
   const themePaletteSelect = document.getElementById('themePaletteSelect');
   const defaultQualitySelect = document.getElementById('defaultQualitySelect');
   const clearCacheBtn = document.getElementById('clearCacheBtn');
@@ -82,15 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let autoPreviewTimeout = null;
   let currentMetadata = null;
   let activeAbortController = null;
-
-  // Platform Sample Mapping
-  const platformSampleLinks = {
-    x: 'https://x.com/Twitter/status/1675604179374026752',
-    twitter: 'https://x.com/Twitter/status/1675604179374026752',
-    instagram: 'https://x.com/NASA/status/1785341201948293120',
-    tiktok: 'https://x.com/Twitter/status/1675604179374026752',
-    reddit: 'https://x.com/NASA/status/1785341201948293120'
-  };
 
   // Color Palette Theme Manager
   const savedPalette = localStorage.getItem('viddownloader_palette') || 'cyberpunk';
@@ -114,11 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Android & Web Push Notification System
-  if (testNotifBtn) {
-    testNotifBtn.addEventListener('click', () => {
-      requestNotificationPermission(() => {
-        sendNotification('VidDownloader Alert ⚡', 'Android notifications are enabled & working perfectly!');
-      });
+  if (notifToggle) {
+    notifToggle.addEventListener('change', () => {
+      if (notifToggle.checked) {
+        requestNotificationPermission(() => {
+          showToast('Android notifications enabled', '🔔');
+        });
+      }
     });
   }
 
@@ -196,25 +179,18 @@ document.addEventListener('DOMContentLoaded', () => {
       platformChips.forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       const platformKey = chip.dataset.platform;
-      const link = platformSampleLinks[platformKey];
-      if (link) {
-        urlInput.value = link;
-        detectPlatform(link);
-        triggerAutoPreview(link);
-      }
-    });
-  });
-
-  // Test Sample Buttons in Guide
-  testSampleBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const sampleKey = btn.dataset.sample;
-      const link = platformSampleLinks[sampleKey];
-      if (link) {
-        urlInput.value = link;
-        switchToTab('tab-saver');
-        detectPlatform(link);
-        triggerAutoPreview(link);
+      if (platformKey === 'twitter') {
+        platformDetector.innerText = '𝕏 X/Twitter Link';
+        platformDetector.style.color = '#1d9bf0';
+      } else if (platformKey === 'instagram') {
+        platformDetector.innerText = '📸 Instagram Link';
+        platformDetector.style.color = '#e1306c';
+      } else if (platformKey === 'tiktok') {
+        platformDetector.innerText = '🎵 TikTok Link';
+        platformDetector.style.color = '#00f2fe';
+      } else if (platformKey === 'reddit') {
+        platformDetector.innerText = '🤖 Reddit Link';
+        platformDetector.style.color = '#ff4500';
       }
     });
   });
@@ -351,15 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Sample Links Helper
-  sampleLinkBtn.addEventListener('click', () => {
-    const link = platformSampleLinks.twitter;
-    urlInput.value = link;
-    detectPlatform(link);
-    triggerAutoPreview(link);
-    showToast('Sample link loaded!', '✨');
-  });
-
   // Paste Clipboard Action
   pasteBtn.addEventListener('click', async () => {
     try {
@@ -387,9 +354,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Clipboard Smart Prompt Simulator
-  setTimeout(() => {
-    if (autoClipboardToggle && autoClipboardToggle.checked) {
-      clipboardBanner.classList.remove('hidden');
+  setTimeout(async () => {
+    if (autoClipboardToggle && autoClipboardToggle.checked && navigator.clipboard && navigator.clipboard.readText) {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text && (text.includes('http://') || text.includes('https://'))) {
+          document.getElementById('detectedUrlSnippet').innerText = text;
+          clipboardBanner.classList.remove('hidden');
+        }
+      } catch (e) {}
     }
   }, 1200);
 
@@ -397,68 +370,30 @@ document.addEventListener('DOMContentLoaded', () => {
     clipboardBanner.classList.add('hidden');
   });
 
-  quickPasteBtn.addEventListener('click', () => {
-    urlInput.value = platformSampleLinks.twitter;
-    detectPlatform(urlInput.value);
-    triggerAutoPreview(urlInput.value);
+  quickPasteBtn.addEventListener('click', async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          urlInput.value = text.trim();
+          detectPlatform(urlInput.value);
+          triggerAutoPreview(urlInput.value);
+        }
+      }
+    } catch (e) {}
     clipboardBanner.classList.add('hidden');
     showToast('Link pasted!', '⚡');
   });
 
-  // Manual Preview Button
-  previewBtn.addEventListener('click', () => {
-    const raw = urlInput.value.trim();
-    if (!raw) {
-      showToast('Please paste a video URL first', '⚠️');
-      return;
-    }
-    triggerAutoPreview(raw);
-  });
-
-  // Download Button Action with AdMob Interstitial Trigger
+  // Direct Start Download Button Action
   downloadBtn.addEventListener('click', () => {
     const raw = urlInput.value.trim();
     if (!raw) {
       showToast('Please paste a video URL first', '⚠️');
       return;
     }
-
-    if (adSimToggle && adSimToggle.checked) {
-      triggerInterstitialAd(() => {
-        executeDownload(raw);
-      });
-    } else {
-      executeDownload(raw);
-    }
+    executeDownload(raw);
   });
-
-  // Interstitial Ad Simulator
-  function triggerInterstitialAd(onComplete) {
-    interstitialModal.classList.remove('hidden');
-    adTimerBar.style.width = '0%';
-    closeAdBtn.disabled = true;
-    closeAdBtn.innerText = 'Please wait (5s)...';
-
-    let seconds = 5;
-    const interval = setInterval(() => {
-      seconds--;
-      adCountdownText.innerText = `${seconds}s`;
-      adTimerBar.style.width = `${((5 - seconds) / 5) * 100}%`;
-
-      if (seconds > 0) {
-        closeAdBtn.innerText = `Please wait (${seconds}s)...`;
-      } else {
-        clearInterval(interval);
-        closeAdBtn.disabled = false;
-        closeAdBtn.innerText = 'Continue to Download ➔';
-      }
-    }, 1000);
-
-    closeAdBtn.onclick = () => {
-      interstitialModal.classList.add('hidden');
-      if (onComplete) onComplete();
-    };
-  }
 
   // Execute Download Logic with REAL-TIME SSE Byte Progress & Speed Streaming
   async function executeDownload(rawUrls) {

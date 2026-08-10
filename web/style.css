@@ -477,6 +477,10 @@ textarea:focus {
   margin-top: 4px;
 }
 
+.action-grid-single {
+  width: 100%;
+}
+
 /* Options Segmented Bar */
 .options-section {
   display: flex;
