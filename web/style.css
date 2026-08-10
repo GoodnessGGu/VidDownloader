@@ -133,6 +133,58 @@ body {
   z-index: 60;
 }
 
+/* Real Ad Banner Slot */
+.ad-banner-slot {
+  margin: 10px 16px 2px 16px;
+  background-color: var(--bg-card);
+  border: 1px dashed var(--border-focus);
+  border-radius: var(--radius-lg);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.ad-slot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ad-slot-label {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  letter-spacing: 0.5px;
+}
+
+.ad-status-tag {
+  font-size: 9px;
+  color: var(--text-dim);
+}
+
+.ad-unit-wrapper {
+  min-height: 60px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+.setting-input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  outline: none;
+  width: 180px;
+}
+
 .brand {
   display: flex;
   align-items: center;

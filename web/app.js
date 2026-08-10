@@ -55,7 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const quickPasteBtn = document.getElementById('quickPasteBtn');
   const closeClipboardBtn = document.getElementById('closeClipboardBtn');
 
-  // Settings & Theme Palette Elements
+  // Settings & Real Ad Network Elements
+  const enableAdsToggle = document.getElementById('enableAdsToggle');
+  const publisherIdInput = document.getElementById('publisherIdInput');
+  const refreshAdBtn = document.getElementById('refreshAdBtn');
+  const realAdBannerContainer = document.getElementById('realAdBannerContainer');
+
   const autoClipboardToggle = document.getElementById('autoClipboardToggle');
   const notifToggle = document.getElementById('notifToggle');
   const themePaletteSelect = document.getElementById('themePaletteSelect');
@@ -72,6 +77,46 @@ document.addEventListener('DOMContentLoaded', () => {
   let autoPreviewTimeout = null;
   let currentMetadata = null;
   let activeAbortController = null;
+
+  // Real Google AdSense / AdMob Initialization
+  function initAdBanner() {
+    if (!enableAdsToggle || !enableAdsToggle.checked) {
+      if (realAdBannerContainer) realAdBannerContainer.classList.add('hidden');
+      return;
+    }
+    if (realAdBannerContainer) realAdBannerContainer.classList.remove('hidden');
+
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      console.log('AdSense Push Event:', e);
+    }
+  }
+
+  setTimeout(initAdBanner, 800);
+
+  if (enableAdsToggle) {
+    enableAdsToggle.addEventListener('change', () => {
+      if (enableAdsToggle.checked) {
+        if (realAdBannerContainer) realAdBannerContainer.classList.remove('hidden');
+        showToast('Real ad banner enabled', '📢');
+        initAdBanner();
+      } else {
+        if (realAdBannerContainer) realAdBannerContainer.classList.add('hidden');
+        showToast('Ad banner hidden', '🙈');
+      }
+    });
+  }
+
+  if (refreshAdBtn) {
+    refreshAdBtn.addEventListener('click', () => {
+      const pubId = publisherIdInput ? publisherIdInput.value.trim() : 'ca-pub-3940256099942544';
+      const statusTag = document.getElementById('adStatusTag');
+      if (statusTag) statusTag.innerText = pubId;
+      showToast(`Ad slot updated for ${pubId}`, '🔄');
+      initAdBanner();
+    });
+  }
 
   // Color Palette Theme Manager
   const savedPalette = localStorage.getItem('viddownloader_palette') || 'cyberpunk';
