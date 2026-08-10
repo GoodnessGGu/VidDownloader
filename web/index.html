@@ -12,7 +12,7 @@
 <body>
   <div class="app-shell">
     
-    <!-- Top Header -->
+    <!-- Top Header Bar -->
     <header class="top-bar">
       <div class="brand">
         <div class="brand-badge">⚡</div>
@@ -50,18 +50,18 @@
       <button id="closeClipboardBtn" class="icon-btn-close">✕</button>
     </div>
 
-    <!-- Main Content Tab Views -->
+    <!-- Main Views Container -->
     <main class="main-container">
       
-      <!-- ================= SAVER VIEW ================= -->
+      <!-- ================= 1. SAVER VIEW ================= -->
       <section id="tab-saver" class="view-tab active-tab">
         
         <!-- Platform Chips -->
         <div class="platform-chips">
-          <button class="chip active" data-platform="twitter"><span class="dot twitter"></span> X / Twitter</button>
-          <button class="chip" data-platform="instagram"><span class="dot instagram"></span> Instagram</button>
-          <button class="chip" data-platform="tiktok"><span class="dot tiktok"></span> TikTok</button>
-          <button class="chip" data-platform="reddit"><span class="dot reddit"></span> Reddit</button>
+          <button class="chip active" data-platform="twitter" title="Load X/Twitter Sample"><span class="dot twitter"></span> X / Twitter</button>
+          <button class="chip" data-platform="instagram" title="Load Instagram Sample"><span class="dot instagram"></span> Instagram</button>
+          <button class="chip" data-platform="tiktok" title="Load TikTok Sample"><span class="dot tiktok"></span> TikTok</button>
+          <button class="chip" data-platform="reddit" title="Load Reddit Sample"><span class="dot reddit"></span> Reddit</button>
         </div>
 
         <!-- Input Glass Card -->
@@ -128,7 +128,7 @@
 
           </div>
 
-          <!-- Primary Actions -->
+          <!-- Primary Action Grid -->
           <div class="action-grid">
             <button id="previewBtn" class="btn btn-secondary">
               <span>👁️</span> Preview Metadata
@@ -167,11 +167,26 @@
               <strong id="previewViews">--</strong>
             </div>
           </div>
+
+          <!-- 1-Tap Quick Action Downloads inside Preview Card -->
+          <div class="preview-quick-actions">
+            <button id="quickDlVideoBtn" class="btn btn-primary btn-sm full-width">
+              <span>🎬</span> Download MP4 Video
+            </button>
+            <button id="quickDlAudioBtn" class="btn btn-secondary btn-sm full-width">
+              <span>🎵</span> Extract MP3 Audio
+            </button>
+          </div>
+        </div>
+
         <!-- Active Download Progress Pop-Out Card -->
         <div id="activeDownloadCard" class="card active-download-card hidden">
           <div class="active-dl-header">
             <span class="active-dl-badge">DOWNLOADING MEDIA</span>
-            <span id="activeDlSpeed" class="speed-badge">⚡ 3.2 MB/s</span>
+            <div class="header-right-tools">
+              <span id="activeDlSpeed" class="speed-badge">⚡ 3.2 MB/s</span>
+              <button id="cancelDlBtn" class="btn-clear btn-sm" title="Cancel Download">✕</button>
+            </div>
           </div>
 
           <div class="active-dl-body">
@@ -197,7 +212,7 @@
       </section>
 
 
-      <!-- ================= LIBRARY VIEW ================= -->
+      <!-- ================= 2. LIBRARY VIEW ================= -->
       <section id="tab-history" class="view-tab hidden">
         <div class="view-title-row">
           <h2>Media Library</h2>
@@ -216,51 +231,64 @@
             <div class="empty-icon">📁</div>
             <h3>Your library is empty</h3>
             <p>Paste a video link on the Saver tab to start downloading media.</p>
+            <button id="emptyStateCta" class="btn btn-primary btn-sm margin-top-sm">
+              <span>⚡</span> Go to Downloader
+            </button>
           </div>
         </div>
       </section>
 
 
-      <!-- ================= GUIDE VIEW ================= -->
+      <!-- ================= 3. GUIDE VIEW ================= -->
       <section id="tab-platforms" class="view-tab hidden">
         <div class="view-title-row">
-          <h2>User Guide</h2>
+          <h2>User Guide & FAQ</h2>
         </div>
 
+        <!-- 1-Tap Interactive Testers -->
         <div class="card">
-          <h3>How to Save Videos</h3>
-          <p class="sub-text">Download videos from any platform in 3 easy steps:</p>
+          <h3>Test Download Samples</h3>
+          <p class="sub-text">Tap any social platform to test live video extraction:</p>
+          <div class="sample-grid margin-top-sm">
+            <button class="btn btn-secondary btn-sm test-sample-btn" data-sample="x">
+              <span>𝕏</span> Test X / Twitter
+            </button>
+            <button class="btn btn-secondary btn-sm test-sample-btn" data-sample="instagram">
+              <span>📸</span> Test Instagram
+            </button>
+            <button class="btn btn-secondary btn-sm test-sample-btn" data-sample="tiktok">
+              <span>🎵</span> Test TikTok
+            </button>
+            <button class="btn btn-secondary btn-sm test-sample-btn" data-sample="reddit">
+              <span>🤖</span> Test Reddit
+            </button>
+          </div>
+        </div>
 
-          <div class="guide-list">
-            <div class="guide-item">
-              <div class="step-badge">1</div>
-              <div class="step-text">
-                <strong>Copy Share Link</strong>
-                <span>Open X (Twitter), TikTok, Instagram, or Reddit and copy the video URL.</span>
-              </div>
-            </div>
+        <div class="card margin-top">
+          <h3>Frequently Asked Questions</h3>
+          
+          <div class="faq-list margin-top-sm">
+            <details class="faq-item">
+              <summary><strong>How do I remove watermarks on TikTok?</strong></summary>
+              <p>VidDownloader automatically extracts clean original streams for TikTok videos without watermarks when available.</p>
+            </details>
 
-            <div class="guide-item">
-              <div class="step-badge">2</div>
-              <div class="step-text">
-                <strong>Auto Preview</strong>
-                <span>Open VidDownloader — the app automatically extracts thumbnail & video details.</span>
-              </div>
-            </div>
+            <details class="faq-item margin-top-sm">
+              <summary><strong>Why did a download fail?</strong></summary>
+              <p>Downloads may fail if the video is from a private account, deleted by the uploader, or behind age-restricted login blocks.</p>
+            </details>
 
-            <div class="guide-item">
-              <div class="step-badge">3</div>
-              <div class="step-text">
-                <strong>Download & Save</strong>
-                <span>Select format (MP4/MP3) and tap Download to save to your local library.</span>
-              </div>
-            </div>
+            <details class="faq-item margin-top-sm">
+              <summary><strong>Where are saved files stored on mobile?</strong></summary>
+              <p>Tap <strong>"💾 Save"</strong> in your Media Library to download files directly to your device's Downloads folder or Camera Roll.</p>
+            </details>
           </div>
         </div>
       </section>
 
 
-      <!-- ================= SETTINGS VIEW ================= -->
+      <!-- ================= 4. SETTINGS VIEW ================= -->
       <section id="tab-settings" class="view-tab hidden">
         <div class="view-title-row">
           <h2>App Settings</h2>
@@ -282,6 +310,19 @@
 
         <div class="card margin-top">
           <h3>Preferences</h3>
+
+          <div class="setting-row">
+            <div>
+              <strong>Default Video Quality</strong>
+              <span>Default quality applied to downloads</span>
+            </div>
+            <select id="defaultQualitySelect" class="setting-select">
+              <option value="best">Best Available</option>
+              <option value="1080p">1080p Full HD</option>
+              <option value="720p">720p HD</option>
+              <option value="480p">480p SD</option>
+            </select>
+          </div>
 
           <div class="setting-row">
             <div>
@@ -307,11 +348,18 @@
         </div>
 
         <div class="card margin-top">
-          <h3>Storage & Cache</h3>
+          <h3>Storage & Legal</h3>
           <div class="storage-row">
             <span>Cache Usage</span>
-            <strong>14.2 MB</strong>
+            <strong id="storageUsageLabel">14.2 MB</strong>
           </div>
+          
+          <div class="legal-links margin-top-sm">
+            <button id="tosBtn" class="text-btn">Terms of Service</button> • 
+            <button id="privacyBtn" class="text-btn">Privacy Policy</button> • 
+            <button id="supportBtn" class="text-btn">Contact Support</button>
+          </div>
+
           <button id="clearCacheBtn" class="btn btn-secondary full-width margin-top-sm">
             <span>🧹</span> Clear App Cache & History
           </button>
@@ -357,7 +405,7 @@
     </div>
 
 
-    <!-- Toast Notification -->
+    <!-- Universal Toast Notification -->
     <div id="toast" class="toast hidden">
       <span id="toastIcon">✨</span>
       <span id="toastMessage">Action completed</span>

@@ -548,6 +548,60 @@ textarea:focus {
   border-radius: var(--radius-md);
 }
 
+.preview-quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.sample-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.faq-item {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  outline: none;
+}
+
+.faq-item p {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.setting-select {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  outline: none;
+}
+
+.header-right-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legal-links {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
 .meta-box {
   display: flex;
   flex-direction: column;

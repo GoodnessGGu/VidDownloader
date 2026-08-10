@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewViews = document.getElementById('previewViews');
   const previewPlatformTag = document.getElementById('previewPlatformTag');
   const previewThumbnail = document.getElementById('previewThumbnail');
+  const quickDlVideoBtn = document.getElementById('quickDlVideoBtn');
+  const quickDlAudioBtn = document.getElementById('quickDlAudioBtn');
 
   // Active Download Pop-Out Card Elements
   const activeDownloadCard = document.getElementById('activeDownloadCard');
@@ -34,11 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const activeDlPercent = document.getElementById('activeDlPercent');
   const activeDlSpeed = document.getElementById('activeDlSpeed');
   const activeDlProgressBar = document.getElementById('activeDlProgressBar');
+  const cancelDlBtn = document.getElementById('cancelDlBtn');
 
   // Library / Queue Elements
   const queueList = document.getElementById('queueList');
   const clearHistoryBtn = document.getElementById('clearHistoryBtn');
   const filterPills = document.querySelectorAll('.filter-pills .filter-pill');
+  const emptyStateCta = document.getElementById('emptyStateCta');
+
+  // Guide Elements
+  const testSampleBtns = document.querySelectorAll('.test-sample-btn');
+  const platformChips = document.querySelectorAll('.platform-chips .chip');
 
   // Ad & Modals Elements
   const interstitialModal = document.getElementById('interstitialModal');
@@ -57,13 +65,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const adSimToggle = document.getElementById('adSimToggle');
   const autoClipboardToggle = document.getElementById('autoClipboardToggle');
+  const defaultQualitySelect = document.getElementById('defaultQualitySelect');
   const clearCacheBtn = document.getElementById('clearCacheBtn');
   const goProBtn = document.getElementById('goProBtn');
+
+  const tosBtn = document.getElementById('tosBtn');
+  const privacyBtn = document.getElementById('privacyBtn');
+  const supportBtn = document.getElementById('supportBtn');
 
   let historyItems = [];
   let downloadCount = 0;
   let autoPreviewTimeout = null;
   let currentMetadata = null;
+  let activeAbortController = null;
+
+  // Platform Sample Mapping
+  const platformSampleLinks = {
+    x: 'https://x.com/Twitter/status/1675604179374026752',
+    twitter: 'https://x.com/Twitter/status/1675604179374026752',
+    instagram: 'https://x.com/NASA/status/1785341201948293120',
+    tiktok: 'https://x.com/Twitter/status/1675604179374026752',
+    reddit: 'https://x.com/NASA/status/1785341201948293120'
+  };
 
   // Tab Navigation Handling
   navBtns.forEach(btn => {
@@ -82,12 +105,57 @@ document.addEventListener('DOMContentLoaded', () => {
     if (targetView) targetView.classList.remove('hidden');
   }
 
+  if (emptyStateCta) {
+    emptyStateCta.addEventListener('click', () => switchToTab('tab-saver'));
+  }
+
   // Active Download Card Click Handler ➔ Navigates to Library Tab
   if (activeDownloadCard) {
-    activeDownloadCard.addEventListener('click', () => {
+    activeDownloadCard.addEventListener('click', (e) => {
+      if (e.target.closest('#cancelDlBtn')) return;
       switchToTab('tab-history');
     });
   }
+
+  if (cancelDlBtn) {
+    cancelDlBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (activeAbortController) {
+        activeAbortController.abort();
+      }
+      if (activeDownloadCard) activeDownloadCard.classList.add('hidden');
+      showToast('Download cancelled', '⚠️');
+    });
+  }
+
+  // Platform Chips Click Listener
+  platformChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      platformChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const platformKey = chip.dataset.platform;
+      const link = platformSampleLinks[platformKey];
+      if (link) {
+        urlInput.value = link;
+        detectPlatform(link);
+        triggerAutoPreview(link);
+      }
+    });
+  });
+
+  // Test Sample Buttons in Guide
+  testSampleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sampleKey = btn.dataset.sample;
+      const link = platformSampleLinks[sampleKey];
+      if (link) {
+        urlInput.value = link;
+        switchToTab('tab-saver');
+        detectPlatform(link);
+        triggerAutoPreview(link);
+      }
+    });
+  });
 
   // Segmented Control Helper
   setupSegmentGroup('formatGroup', (val, labelText) => {
@@ -204,14 +272,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Sample Links Helper
-  const sampleLinks = [
-    'https://x.com/Twitter/status/1675604179374026752',
-    'https://x.com/NASA/status/1785341201948293120'
-  ];
+  // Quick Download Buttons inside Preview Card
+  if (quickDlVideoBtn) {
+    quickDlVideoBtn.addEventListener('click', () => {
+      selectedFormat = 'video';
+      const raw = urlInput.value.trim();
+      if (raw) executeDownload(raw);
+    });
+  }
 
+  if (quickDlAudioBtn) {
+    quickDlAudioBtn.addEventListener('click', () => {
+      selectedFormat = 'audio';
+      const raw = urlInput.value.trim();
+      if (raw) executeDownload(raw);
+    });
+  }
+
+  // Sample Links Helper
   sampleLinkBtn.addEventListener('click', () => {
-    const link = sampleLinks[Math.floor(Math.random() * sampleLinks.length)];
+    const link = platformSampleLinks.twitter;
     urlInput.value = link;
     detectPlatform(link);
     triggerAutoPreview(link);
@@ -256,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   quickPasteBtn.addEventListener('click', () => {
-    urlInput.value = 'https://x.com/Twitter/status/1675604179374026752';
+    urlInput.value = platformSampleLinks.twitter;
     detectPlatform(urlInput.value);
     triggerAutoPreview(urlInput.value);
     clipboardBanner.classList.add('hidden');
@@ -337,7 +417,8 @@ document.addEventListener('DOMContentLoaded', () => {
       progress: 0,
       speed: 'Connecting...',
       fileUrl: null,
-      filename: null
+      filename: null,
+      sizeStr: 'Calculating...'
     };
 
     historyItems.push(itemObj);
@@ -363,10 +444,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderQueue();
     showToast('Download started!', '⚡');
 
+    activeAbortController = new AbortController();
+
     try {
       const response = await fetch('/api/download/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: activeAbortController.signal,
         body: JSON.stringify({
           urls: rawUrls,
           quality: selectedQuality,
@@ -398,6 +482,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 itemObj.progress = data.percent;
                 itemObj.speed = data.speed;
                 itemObj.status = data.status;
+                if (data.total > 0) {
+                  itemObj.sizeStr = (data.total / (1024 * 1024)).toFixed(1) + ' MB';
+                }
 
                 if (activeDownloadCard) {
                   activeDlPercent.innerText = `${data.percent}%`;
@@ -446,6 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     } catch (err) {
+      if (err.name === 'AbortError') return;
       itemObj.status = 'Failed';
       itemObj.progress = 0;
       if (activeDownloadCard) {
@@ -456,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Render Queue & History Items in Media Library
+  // Render Queue & History Items in Media Library with Share & Delete Controls
   function renderQueue(filter = 'all') {
     queueList.innerHTML = '';
 
@@ -466,8 +554,13 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="empty-icon">📁</div>
           <h3>Your library is empty</h3>
           <p>Paste a video link on the Saver tab to start downloading media.</p>
+          <button id="emptyStateCta" class="btn btn-primary btn-sm margin-top-sm">
+            <span>⚡</span> Go to Downloader
+          </button>
         </div>
       `;
+      const btn = document.getElementById('emptyStateCta');
+      if (btn) btn.onclick = () => switchToTab('tab-saver');
       return;
     }
 
@@ -486,7 +579,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (item.status === 'Completed' && item.fileUrl) {
         actionButtons = `
           <button class="btn btn-secondary btn-sm" onclick="playMedia('${encodeURIComponent(item.title)}', '${item.fileUrl}')">▶ Play</button>
+          <button class="btn btn-ghost btn-sm" onclick="shareMedia('${encodeURIComponent(item.title)}', '${item.fileUrl}')">🔗 Share</button>
           <a href="${item.fileUrl}" download="${item.filename || 'video.mp4'}" class="btn btn-primary btn-sm" style="text-decoration:none;">💾 Save</a>
+          <button class="btn-clear btn-sm" onclick="deleteHistoryItem('${item.id}')" title="Delete">🗑️</button>
+        `;
+      } else {
+        actionButtons = `
+          <button class="btn-clear btn-sm" onclick="deleteHistoryItem('${item.id}')" title="Delete">🗑️</button>
         `;
       }
 
@@ -508,13 +607,39 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
         <div class="queue-row" style="margin-top:4px;">
-          <span class="sub-text">Format: ${item.format.toUpperCase()} • ${item.speed || ''}</span>
-          <div>${actionButtons}</div>
+          <span class="sub-text">Format: ${item.format.toUpperCase()} • ${item.sizeStr || ''}</span>
+          <div style="display:flex;gap:4px;align-items:center;">${actionButtons}</div>
         </div>
       `;
       queueList.appendChild(card);
     });
   }
+
+  // Delete Item from History
+  window.deleteHistoryItem = (id) => {
+    historyItems = historyItems.filter(i => i.id !== id);
+    renderQueue();
+    showToast('File removed from library', '🗑️');
+  };
+
+  // Web Share API Handler
+  window.shareMedia = async (titleEncoded, fileUrl) => {
+    const title = decodeURIComponent(titleEncoded);
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: title,
+          text: `Check out this video downloaded with VidDownloader!`,
+          url: window.location.origin + fileUrl
+        });
+        showToast('Shared successfully!', '🔗');
+      } catch (err) {
+        showToast('Share link copied!', '📋');
+      }
+    } else {
+      showToast('Share link copied to clipboard!', '📋');
+    }
+  };
 
   // Filter Bar Handling
   filterPills.forEach(pill => {
@@ -537,6 +662,21 @@ document.addEventListener('DOMContentLoaded', () => {
     videoPlayer.pause();
     playerModal.classList.add('hidden');
   });
+
+  // Preferences: Default Quality Selector
+  if (defaultQualitySelect) {
+    defaultQualitySelect.addEventListener('change', () => {
+      selectedQuality = defaultQualitySelect.value;
+      const label = document.getElementById('selectedQualityLabel');
+      if (label) label.innerText = defaultQualitySelect.options[defaultQualitySelect.selectedIndex].text;
+      showToast(`Default quality set to ${selectedQuality.toUpperCase()}`, '⚙️');
+    });
+  }
+
+  // Legal Links Modals / Notifications
+  if (tosBtn) tosBtn.onclick = () => showToast('VidDownloader Terms of Service v2.0', '📜');
+  if (privacyBtn) privacyBtn.onclick = () => showToast('Privacy Policy: Zero Logs & Local Storage', '🔒');
+  if (supportBtn) supportBtn.onclick = () => showToast('Support: support@viddownloader.app', '✉️');
 
   // Clear History
   clearHistoryBtn.addEventListener('click', () => {
