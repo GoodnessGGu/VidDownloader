@@ -31,6 +31,64 @@
   --shadow-accent: 0 4px 16px rgba(79, 70, 229, 0.35);
 }
 
+/* Palette Theme 1: Emerald Forest */
+body.theme-emerald {
+  --bg-dark: #05130f;
+  --bg-card: #0c201a;
+  --bg-card-hover: #122c24;
+  --bg-input: #040e0b;
+  --bg-pill: #13332a;
+  --border-focus: #10b981;
+  --accent-primary: #10b981;
+  --accent-cyan: #14b8a6;
+  --accent-gradient: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+  --shadow-accent: 0 4px 16px rgba(16, 185, 129, 0.35);
+}
+
+/* Palette Theme 2: Royal Violet */
+body.theme-violet {
+  --bg-dark: #0f0817;
+  --bg-card: #191026;
+  --bg-card-hover: #231736;
+  --bg-input: #0a0512;
+  --bg-pill: #2a1a40;
+  --border-focus: #8b5cf6;
+  --accent-primary: #8b5cf6;
+  --accent-cyan: #ec4899;
+  --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  --shadow-accent: 0 4px 16px rgba(139, 92, 246, 0.35);
+}
+
+/* Palette Theme 3: Clean Light Slate */
+body.theme-light {
+  --bg-dark: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-input: #f1f5f9;
+  --bg-pill: #e2e8f0;
+  --border-subtle: rgba(0, 0, 0, 0.1);
+  --border-focus: #4f46e5;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #64748b;
+  --accent-cyan: #0284c7;
+}
+
+body.theme-light .app-shell {
+  background-color: #f8fafc;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.12);
+}
+
+body.theme-light .top-bar,
+body.theme-light .bottom-nav {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.theme-light textarea {
+  color: #0f172a;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

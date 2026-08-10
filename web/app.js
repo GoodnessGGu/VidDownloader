@@ -63,8 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const quickPasteBtn = document.getElementById('quickPasteBtn');
   const closeClipboardBtn = document.getElementById('closeClipboardBtn');
 
+  // Settings & Theme Palette Elements
   const adSimToggle = document.getElementById('adSimToggle');
   const autoClipboardToggle = document.getElementById('autoClipboardToggle');
+  const notifToggle = document.getElementById('notifToggle');
+  const testNotifBtn = document.getElementById('testNotifBtn');
+  const themePaletteSelect = document.getElementById('themePaletteSelect');
   const defaultQualitySelect = document.getElementById('defaultQualitySelect');
   const clearCacheBtn = document.getElementById('clearCacheBtn');
   const goProBtn = document.getElementById('goProBtn');
@@ -87,6 +91,63 @@ document.addEventListener('DOMContentLoaded', () => {
     tiktok: 'https://x.com/Twitter/status/1675604179374026752',
     reddit: 'https://x.com/NASA/status/1785341201948293120'
   };
+
+  // Color Palette Theme Manager
+  const savedPalette = localStorage.getItem('viddownloader_palette') || 'cyberpunk';
+  applyThemePalette(savedPalette);
+  if (themePaletteSelect) themePaletteSelect.value = savedPalette;
+
+  if (themePaletteSelect) {
+    themePaletteSelect.addEventListener('change', () => {
+      const selected = themePaletteSelect.value;
+      applyThemePalette(selected);
+      localStorage.setItem('viddownloader_palette', selected);
+      showToast(`Color palette updated!`, '🎨');
+    });
+  }
+
+  function applyThemePalette(palette) {
+    document.body.classList.remove('theme-emerald', 'theme-violet', 'theme-light');
+    if (palette === 'emerald') document.body.classList.add('theme-emerald');
+    if (palette === 'violet') document.body.classList.add('theme-violet');
+    if (palette === 'light') document.body.classList.add('theme-light');
+  }
+
+  // Android & Web Push Notification System
+  if (testNotifBtn) {
+    testNotifBtn.addEventListener('click', () => {
+      requestNotificationPermission(() => {
+        sendNotification('VidDownloader Alert ⚡', 'Android notifications are enabled & working perfectly!');
+      });
+    });
+  }
+
+  function requestNotificationPermission(onGranted) {
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        if (onGranted) onGranted();
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted' && onGranted) onGranted();
+        });
+      }
+    }
+  }
+
+  function sendNotification(title, body, iconUrl = null) {
+    if (!notifToggle || !notifToggle.checked) return;
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(title, {
+          body: body,
+          icon: iconUrl || '/favicon.ico',
+          badge: '/favicon.ico'
+        });
+      } catch (e) {
+        console.log('Notification error:', e);
+      }
+    }
+  }
 
   // Tab Navigation Handling
   navBtns.forEach(btn => {
@@ -124,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         activeAbortController.abort();
       }
       if (activeDownloadCard) activeDownloadCard.classList.add('hidden');
+      sendNotification('Download Cancelled ⚠️', 'Your download was stopped.');
       showToast('Download cancelled', '⚠️');
     });
   }
@@ -443,6 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderQueue();
     showToast('Download started!', '⚡');
+    sendNotification('⚡ Download Started', `Downloading: ${itemObj.title}`, thumbUrl);
 
     activeAbortController = new AbortController();
 
@@ -517,6 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 renderQueue();
                 showToast('Download completed!', '🎉');
+                sendNotification('🎉 Download Completed', `${itemObj.title} is ready in Media Library!`, itemObj.thumbnail);
               } else if (data.type === 'error') {
                 itemObj.status = 'Failed';
                 itemObj.progress = 0;
@@ -525,6 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 renderQueue();
                 showToast(data.detail || 'Download failed', '❌');
+                sendNotification('❌ Download Failed', data.detail || 'Video extraction encountered an error.');
               }
             } catch (e) {
               console.error('SSE JSON parse error:', e);
@@ -541,6 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       renderQueue();
       showToast('Server connection error.', '❌');
+      sendNotification('❌ Download Error', 'Network or server connection failed.');
     }
   }
 

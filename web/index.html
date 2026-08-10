@@ -313,6 +313,33 @@
 
           <div class="setting-row">
             <div>
+              <strong>App Color Theme & Palette</strong>
+              <span>Select your favorite UI color theme</span>
+            </div>
+            <select id="themePaletteSelect" class="setting-select">
+              <option value="cyberpunk">🌌 Cyberpunk Indigo</option>
+              <option value="emerald">🌿 Emerald Forest</option>
+              <option value="violet">💜 Royal Violet</option>
+              <option value="light">☀️ Clean Light Slate</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <strong>Android Push Notifications</strong>
+              <span>Pop-up alerts for download progress & completion</span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button id="testNotifBtn" class="btn btn-ghost btn-sm">Test</button>
+              <label class="switch">
+                <input type="checkbox" id="notifToggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div>
               <strong>Default Video Quality</strong>
               <span>Default quality applied to downloads</span>
             </div>
