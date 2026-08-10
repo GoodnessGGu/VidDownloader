@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import asyncio
+import json
 import os
 from pathlib import Path
 from typing import Any, List, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -15,6 +17,7 @@ from downloader import (
     download_batch_videos,
     download_video,
     extract_metadata,
+    format_speed,
     parse_multiple_urls,
 )
 
@@ -61,6 +64,84 @@ def extract_media_info(payload: ExtractRequest) -> dict[str, Any]:
         return {"success": True, "metadata": metadata}
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/download/stream")
+async def download_media_stream(payload: DownloadRequest):
+    """Stream real-time download progress (bytes, %, speed) and completion metadata."""
+    async def event_generator():
+        queue: asyncio.Queue[dict[str, Any]] = asyncio.Queue()
+        loop = asyncio.get_running_loop()
+
+        def progress_hook(d: dict[str, Any]):
+            status = d.get("status")
+            if status == "downloading":
+                total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
+                downloaded = d.get("downloaded_bytes") or 0
+                speed_val = d.get("speed")
+                percent = round((downloaded / total * 100), 1) if total > 0 else 0.0
+                speed_str = format_speed(speed_val) if speed_val is not None else "Calculating..."
+                
+                msg = {
+                    "type": "progress",
+                    "percent": percent,
+                    "downloaded": downloaded,
+                    "total": total,
+                    "speed": speed_str,
+                    "status": "Downloading",
+                }
+                loop.call_soon_threadsafe(queue.put_nowait, msg)
+            elif status == "finished":
+                msg = {
+                    "type": "progress",
+                    "percent": 100.0,
+                    "speed": "Processing...",
+                    "status": "Processing",
+                }
+                loop.call_soon_threadsafe(queue.put_nowait, msg)
+
+        def run_dl():
+            try:
+                urls = parse_multiple_urls(payload.urls) if isinstance(payload.urls, str) else payload.urls
+                if not urls:
+                    raise ValueError("No valid URL provided.")
+                target_url = urls[0]
+                _, created_files, metadata = download_video(
+                    url=target_url,
+                    output_path=DEFAULT_OUTPUT_DIR,
+                    format_choice=payload.format_choice or "video",
+                    quality=payload.quality or "best",
+                    audio_format=payload.audio_format or "m4a",
+                    progress_hook=progress_hook,
+                )
+                file_info = []
+                for filepath in created_files:
+                    fname = Path(filepath).name
+                    file_info.append({
+                        "filename": fname,
+                        "download_url": f"/api/files/{fname}",
+                    })
+                loop.call_soon_threadsafe(queue.put_nowait, {
+                    "type": "complete",
+                    "success": True,
+                    "metadata": metadata,
+                    "files": file_info,
+                })
+            except Exception as exc:
+                loop.call_soon_threadsafe(queue.put_nowait, {
+                    "type": "error",
+                    "detail": str(exc),
+                })
+
+        loop.run_in_executor(None, run_dl)
+
+        while True:
+            item = await queue.get()
+            yield f"data: {json.dumps(item)}\n\n"
+            if item.get("type") in ("complete", "error"):
+                break
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 @app.post("/api/download")

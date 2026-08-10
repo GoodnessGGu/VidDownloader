@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Execute Download Logic with Live Speed, Progress % and Thumbnail Pop-Out
+  // Execute Download Logic with REAL-TIME SSE Byte Progress & Speed Streaming
   async function executeDownload(rawUrls) {
     downloadCount++;
     const id = 'media_' + Date.now();
@@ -334,8 +334,8 @@ document.addEventListener('DOMContentLoaded', () => {
       format: selectedFormat,
       quality: selectedQuality,
       status: 'Downloading',
-      progress: 15,
-      speed: '2.4 MB/s',
+      progress: 0,
+      speed: 'Connecting...',
       fileUrl: null,
       filename: null
     };
@@ -345,10 +345,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pop out Active Download Card on Main Saver Screen
     if (activeDownloadCard) {
       activeDlTitle.innerText = itemObj.title;
-      activeDlStatusText.innerText = 'Downloading...';
-      activeDlPercent.innerText = '15%';
-      activeDlSpeed.innerText = '⚡ 2.4 MB/s';
-      activeDlProgressBar.style.width = '15%';
+      activeDlStatusText.innerText = 'Connecting...';
+      activeDlPercent.innerText = '0%';
+      activeDlSpeed.innerText = '⚡ Connecting...';
+      activeDlProgressBar.style.width = '0%';
 
       if (thumbUrl) {
         activeDlThumbnail.src = thumbUrl;
@@ -363,28 +363,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderQueue();
     showToast('Download started!', '⚡');
 
-    // Simulate Live Progress Animation while request resolves
-    let fakeProgress = 15;
-    const progressInterval = setInterval(() => {
-      if (fakeProgress < 85) {
-        fakeProgress += Math.floor(Math.random() * 15) + 5;
-        const fakeSpeed = (Math.random() * 2.5 + 2.1).toFixed(1) + ' MB/s';
-        
-        itemObj.progress = fakeProgress;
-        itemObj.speed = fakeSpeed;
-
-        if (activeDownloadCard) {
-          activeDlPercent.innerText = `${fakeProgress}%`;
-          activeDlSpeed.innerText = `⚡ ${fakeSpeed}`;
-          activeDlProgressBar.style.width = `${fakeProgress}%`;
-        }
-
-        renderQueue();
-      }
-    }, 400);
-
     try {
-      const res = await fetch('/api/download', {
+      const response = await fetch('/api/download/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -395,46 +375,77 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       });
 
-      const data = await res.json();
-      clearInterval(progressInterval);
+      if (!response.ok) throw new Error('Stream request failed');
 
-      if (data.success && data.successful && data.successful.length > 0) {
-        const first = data.successful[0];
-        const files = first.files || [];
-        const meta = first.metadata || {};
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
 
-        itemObj.title = meta.title || itemObj.title;
-        itemObj.thumbnail = meta.thumbnail || itemObj.thumbnail;
-        itemObj.status = 'Completed';
-        itemObj.progress = 100;
-        itemObj.speed = 'Done';
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
 
-        if (files.length > 0) {
-          itemObj.fileUrl = files[0].download_url;
-          itemObj.filename = files[0].filename;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              
+              if (data.type === 'progress') {
+                itemObj.progress = data.percent;
+                itemObj.speed = data.speed;
+                itemObj.status = data.status;
+
+                if (activeDownloadCard) {
+                  activeDlPercent.innerText = `${data.percent}%`;
+                  activeDlSpeed.innerText = `⚡ ${data.speed}`;
+                  activeDlStatusText.innerText = data.status;
+                  activeDlProgressBar.style.width = `${data.percent}%`;
+                }
+                renderQueue();
+              } else if (data.type === 'complete') {
+                const meta = data.metadata || {};
+                const files = data.files || [];
+
+                itemObj.title = meta.title || itemObj.title;
+                itemObj.thumbnail = meta.thumbnail || itemObj.thumbnail;
+                itemObj.status = 'Completed';
+                itemObj.progress = 100;
+                itemObj.speed = 'Finished';
+
+                if (files.length > 0) {
+                  itemObj.fileUrl = files[0].download_url;
+                  itemObj.filename = files[0].filename;
+                }
+
+                if (activeDownloadCard) {
+                  activeDlStatusText.innerText = 'Completed!';
+                  activeDlPercent.innerText = '100%';
+                  activeDlSpeed.innerText = '⚡ Finished';
+                  activeDlProgressBar.style.width = '100%';
+                }
+
+                renderQueue();
+                showToast('Download completed!', '🎉');
+              } else if (data.type === 'error') {
+                itemObj.status = 'Failed';
+                itemObj.progress = 0;
+                if (activeDownloadCard) {
+                  activeDlStatusText.innerText = 'Failed';
+                }
+                renderQueue();
+                showToast(data.detail || 'Download failed', '❌');
+              }
+            } catch (e) {
+              console.error('SSE JSON parse error:', e);
+            }
+          }
         }
-
-        // Update Active Download Card on Main Screen
-        if (activeDownloadCard) {
-          activeDlStatusText.innerText = 'Completed!';
-          activeDlPercent.innerText = '100%';
-          activeDlSpeed.innerText = '⚡ Finished';
-          activeDlProgressBar.style.width = '100%';
-        }
-
-        renderQueue();
-        showToast('Download completed!', '🎉');
-      } else {
-        itemObj.status = 'Failed';
-        itemObj.progress = 0;
-        if (activeDownloadCard) {
-          activeDlStatusText.innerText = 'Failed';
-        }
-        renderQueue();
-        showToast(data.detail || 'Download failed', '❌');
       }
     } catch (err) {
-      clearInterval(progressInterval);
       itemObj.status = 'Failed';
       itemObj.progress = 0;
       if (activeDownloadCard) {
