@@ -1,0 +1,36 @@
+{
+  "packageId": "com.viddownloader.app",
+  "host": "localhost",
+  "name": "VidDownloader",
+  "launcherName": "VidDownloader",
+  "themeColor": "#4F46E5",
+  "navigationColor": "#070A12",
+  "navigationColorDark": "#070A12",
+  "backgroundColor": "#070A12",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "http://localhost:8000/icon-512.png",
+  "maskableIconUrl": "http://localhost:8000/icon-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "http://localhost:8000/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  }
+}
