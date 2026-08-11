@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // App Owner Developer Configuration (Your AdMob / AdSense Credentials)
-  // When deploying for your users, update ADMOB_PUBLISHER_ID and ADMOB_BANNER_SLOT_ID below:
+  // App Owner Production AdMob Credentials
   const APP_CONFIG = {
-    ADMOB_PUBLISHER_ID: 'ca-pub-3940256099942544', // Replace with your real ca-pub-XXXXXXXXXXXXXXXX
-    ADMOB_BANNER_SLOT_ID: '6303278111',           // Replace with your real 10-digit Slot ID
+    ADMOB_APP_ID: 'ca-app-pub-6127728831893758~6774359110',
+    ADMOB_PUBLISHER_ID: 'ca-pub-6127728831893758',
+    ADMOB_BANNER_SLOT_ID: '3825330362',
+    ADMOB_INTERSTITIAL_SLOT_ID: '4948004067',
     ENABLE_ADS: true
   };
 
