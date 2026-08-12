@@ -1,12 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // App Owner Production AdMob Credentials
+  // App Owner Production AdMob & Remote API Credentials
   const APP_CONFIG = {
     ADMOB_APP_ID: 'ca-app-pub-6127728831893758~6774359110',
     ADMOB_PUBLISHER_ID: 'ca-pub-6127728831893758',
     ADMOB_BANNER_SLOT_ID: '3825330362',
     ADMOB_INTERSTITIAL_SLOT_ID: '4948004067',
-    ENABLE_ADS: true
+    ENABLE_ADS: true,
+    REMOTE_BACKEND_URL: 'http://192.168.43.101:8000'
   };
+
+  function getApiUrl(path) {
+    const isMobileApp = window.Capacitor || location.protocol === 'capacitor:' || location.protocol === 'file:' || (location.origin.includes('localhost') && !location.port);
+    if (isMobileApp) {
+      return (APP_CONFIG.REMOTE_BACKEND_URL || 'http://192.168.43.101:8000') + path;
+    }
+    return path;
+  }
 
   // Navigation Tabs
   const navBtns = document.querySelectorAll('.nav-item');
@@ -307,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     previewPlatformTag.innerText = platformDetector.innerText;
 
     try {
-      const res = await fetch('/api/extract', {
+      const res = await fetch(getApiUrl('/api/extract'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: raw })
@@ -474,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
     activeAbortController = new AbortController();
 
     try {
-      const response = await fetch('/api/download/stream', {
+      const response = await fetch(getApiUrl('/api/download/stream'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: activeAbortController.signal,
@@ -531,7 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 itemObj.speed = 'Finished';
 
                 if (files.length > 0) {
-                  itemObj.fileUrl = files[0].download_url;
+                  itemObj.fileUrl = getApiUrl(files[0].download_url);
                   itemObj.filename = files[0].filename;
                 }
 
